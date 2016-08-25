@@ -1,0 +1,406 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            101.36106491088867,
+            1.6753479130678832
+          ],
+          [
+            101.42938613891602,
+            1.6554436046743541
+          ],
+          [
+            101.44208908081055,
+            1.6713155909875106
+          ]
+        ]
+      },
+      "properties": {}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            101.46886825561522,
+            1.7091504549032157
+          ],
+          [
+            101.42955780029297,
+            1.6555293995376572
+          ],
+          [
+            101.44964218139648,
+            1.6741038996934774
+          ]
+        ]
+      },
+      "properties": {}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.43625259399414,
+          1.604309212387116
+        ]
+      },
+      "properties": {
+        "name": "(cluster) Dumai Airport"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.42921447753906,
+          1.655100425184043
+        ]
+      },
+      "properties": {
+        "_storage_options": {
+          "color": "Chocolate"
+        },
+        "name": "(cluster) Dumai City"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            101.43402099609374,
+            1.6106581837702312
+          ],
+          [
+            101.45015716552733,
+            1.6741467967195256
+          ]
+        ]
+      },
+      "properties": {}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            101.36089324951172,
+            1.6758626769917724
+          ],
+          [
+            101.44223928451537,
+            1.6716373191172977
+          ]
+        ]
+      },
+      "properties": {}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            101.45007133483887,
+            1.673975208609684
+          ],
+          [
+            101.44226074218749,
+            1.6716587676574202
+          ]
+        ]
+      },
+      "properties": {}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            101.36827468872069,
+            1.6530413469953869
+          ],
+          [
+            101.348876953125,
+            1.6502959060890205
+          ]
+        ]
+      },
+      "properties": {}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.71142578125,
+          1.290784355433135
+        ]
+      },
+      "properties": {
+        "name": "a"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            102,
+            0
+          ],
+          [
+            103,
+            1
+          ],
+          [
+            104,
+            0
+          ],
+          [
+            105,
+            1
+          ]
+        ]
+      },
+      "properties": {
+        "prop0": "value0",
+        "prop1": 0,
+        "name": "abc"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          99.99206542968749,
+          0.9942127983364538
+        ]
+      },
+      "properties": {
+        "prop0": "value0",
+        "description": "{\"type\":\"FeatureCollection\",\n    \"features\":[\n        {\"type\":\"Feature\",\n            \"properties\":{\n                \"name\":\"TRON-02\",\n                \"serial\":\"TRON002\",\n                \"bearing\":0,\n                \"color\":\"green\",\n                \"size\":15,\n                \"image\":\"img/unit_map3.png\",\n            },\n            \"geometry\":{\n                \"type\":\"Point\",\n                \"coordinates\":[-50.06542968749966,-23.749149728383717]\n            }\n        }\n    ]\n}",
+        "name": "Ali Aga"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.15087890624999,
+          1.3621763466641585
+        ]
+      },
+      "properties": {
+        "name": "b"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.986328125,
+          0.002746582030202296
+        ]
+      },
+      "properties": {
+        "name": "Balung"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              101.326904296875,
+              1.345701455472609
+            ],
+            [
+              100.97396850585936,
+              0.7676467105818383
+            ],
+            [
+              100.85311889648438,
+              0.8472896733926131
+            ],
+            [
+              100.78994750976562,
+              1.2262552510841702
+            ],
+            [
+              101.326904296875,
+              1.345701455472609
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "prop0": "value0",
+        "prop1": {
+          "this": "that"
+        },
+        "name": "def"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.46903991699219,
+          1.7094936248854367
+        ]
+      },
+      "properties": {
+        "name": "Dumai"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.44981384277342,
+          1.6741467967195256
+        ]
+      },
+      "properties": {
+        "name": "Dumai"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.36123657226562,
+          1.6756910890321803
+        ]
+      },
+      "properties": {
+        "name": "Dumai"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.43316268920898,
+          1.6077410912622514
+        ]
+      },
+      "properties": {
+        "name": "Dumai Airport"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.44208908081055,
+          1.67122979681066
+        ]
+      },
+      "properties": {
+        "name": "Dumai City"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            101.8597412109375,
+            0.9969589657344593
+          ],
+          [
+            101.71417236328124,
+            1.2852925793638672
+          ],
+          [
+            102.14263916015625,
+            1.3731595449619909
+          ],
+          [
+            102.24151611328125,
+            1.098565496040652
+          ],
+          [
+            101.65374755859375,
+            0.7058537268567115
+          ]
+        ]
+      },
+      "properties": {
+        "name": "foo",
+        "_storage_options": {
+          "color": "Chocolate"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.47436141967773,
+          1.6472072805392213
+        ]
+      },
+      "properties": {
+        "_storage_options": {
+          "color": "Magenta"
+        },
+        "name": "myName",
+        "description": "myDescription"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.008544921875,
+          0.002746582030202296
+        ]
+      },
+      "properties": {
+        "name": "Nagari"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.46835327148438,
+          1.6351959135231982
+        ]
+      },
+      "properties": {
+        "name": "myPoint00"
+      }
+    }
+  ]
+}
