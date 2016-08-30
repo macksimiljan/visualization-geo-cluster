@@ -1,4 +1,4 @@
-package general;
+package representation;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -7,8 +7,10 @@ public class Vertex {
 
 	public Long id;
 	public Set<String> typeInternInput;
-	public Float lon;
-	public Float lat;
+	public Float vertexAggSimValue;
+	public Long ccId;
+	public Double lon;
+	public Double lat;
 	public String label;
 	public String url;
 	public String ontology;
@@ -16,12 +18,23 @@ public class Vertex {
 	public Vertex() {
 		this.id = null;
 		this.typeInternInput = new HashSet<String>();
+		this.vertexAggSimValue = null;
+		this.ccId = null;
 		this.lon = null;
 		this.lat = null;
 		this.label = null;
 		this.url = null;
 		this.ontology = null;
 	}
+	
+	
+
+	@Override
+	public String toString() {
+		return "Vertex [id=" + id + ", lon=" + lon + ", lat=" + lat + ", label=" + label + "]";
+	}
+
+
 
 	@Override
 	public int hashCode() {

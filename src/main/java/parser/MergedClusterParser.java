@@ -8,21 +8,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import general.ClusterRepresentative;
-import general.Vertex;
-import general.VertexDict;
+import representation.ClusterRepresentative;
 
 public class MergedClusterParser {
 	
 	
-	
-	public MergedClusterParser() {
-		
-	}
-	
 	public ClusterRepresentative parseLine(String line) {
 		JSONParser parser = new JSONParser();
-		VertexDict dict = new VertexDict();
 		ClusterRepresentative r = new ClusterRepresentative();
 		
 		try {
@@ -30,8 +22,20 @@ public class MergedClusterParser {
 			r.id = (Long) object.get("id");
 			JSONObject data = (JSONObject)object.get("data");
 			r.label = (String)data.get("label");
-			r.lat = (Float)data.get("lat");
-			r.lon = (Float)data.get("lon");
+			try {
+				r.lat = (Double)data.get("lat");
+			} catch(Exception e) {
+				if (data.get("lat") != null) {
+					r.lat = ((Long)data.get("lat")).doubleValue();
+				}
+			}
+			try {
+				r.lon = (Double)data.get("lon");
+			} catch(Exception e) {
+				if (data.get("lon") != null) {
+					r.lon = ((Long)data.get("lon")).doubleValue();
+				}
+			}
 			r.ontologies = new HashSet<String>();
 			JSONArray ontologies = (JSONArray)data.get("ontologies");
 			Iterator it = ontologies.iterator();
@@ -41,17 +45,19 @@ public class MergedClusterParser {
 			}
 			r.typeIntern = new HashSet<String>();
 			JSONArray typeInterns = (JSONArray)data.get("typeIntern");
-			it = typeInterns.iterator();
-			while (it.hasNext()) {
-				String type = (String)it.next();
-				r.typeIntern.add(type);
+			if (typeInterns != null) {
+				it = typeInterns.iterator();
+				while (it.hasNext()) {
+					String type = (String)it.next();
+					r.typeIntern.add(type);
+				}
 			}
-			r.clusteredVertices = new HashSet<Vertex>();
+			r.clusteredVertexIds = new HashSet<Long>();
 			JSONArray vertices = (JSONArray)data.get("clusteredVertices");
 			it = vertices.iterator();
 			while (it.hasNext()) {
 				Long id = (Long)it.next();
-				r.clusteredVertices.add(dict.getVertexById(id));
+				r.clusteredVertexIds.add(id);
 			}
 			
  		} catch (ParseException e) {

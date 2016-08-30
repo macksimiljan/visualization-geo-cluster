@@ -1,4 +1,4 @@
-package general;
+package representation;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -7,12 +7,12 @@ public class ClusterRepresentative extends Vertex {
 	
 	public Set<String> typeIntern;
 	public Set<String> ontologies;
-	public Set<Vertex> clusteredVertices;
+	public Set<Long> clusteredVertexIds;
 
 	
 	public ClusterRepresentative() {
 		this.typeIntern = new HashSet<String>();
 		this.ontologies = new HashSet<String>();
-		this.clusteredVertices = new HashSet<Vertex>();		
+		this.clusteredVertexIds = new HashSet<Long>();		
 	}
 }
