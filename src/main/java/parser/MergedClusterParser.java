@@ -10,6 +10,11 @@ import org.json.simple.parser.ParseException;
 
 import representation.ClusterRepresentative;
 
+/**
+ * Parses data in 'mergedCluster.geojson'.
+ * @author MM
+ *
+ */
 public class MergedClusterParser {
 	
 	

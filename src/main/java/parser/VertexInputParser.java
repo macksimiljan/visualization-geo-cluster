@@ -10,7 +10,11 @@ import org.json.simple.parser.ParseException;
 
 import representation.Vertex;
 
-
+/**
+ * Parses data in 'vertexInput.geojson'.
+ * @author MM
+ *
+ */
 public class VertexInputParser {
 	
 	
