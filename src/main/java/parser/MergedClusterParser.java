@@ -8,7 +8,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import general.VertexDict;
 import representation.ClusterRepresentative;
+import representation.Vertex;
 
 /**
  * Parses data in 'mergedCluster.geojson'.
@@ -16,6 +18,15 @@ import representation.ClusterRepresentative;
  *
  */
 public class MergedClusterParser {
+	
+	public ClusterRepresentative buildClusterRepresentative(String line, VertexDict dict) {
+		ClusterRepresentative r = this.parseLine(line);
+		Vertex underlyingVertex = dict.getVertexById(r.id);
+		
+		
+		
+		return r;
+	}
 	
 	
 	public ClusterRepresentative parseLine(String line) {

@@ -14,6 +14,7 @@ public class Vertex {
 	public String label;
 	public String url;
 	public String ontology;
+	public String processingNote;
 	
 	public Vertex() {
 		this.id = null;
@@ -25,13 +26,14 @@ public class Vertex {
 		this.label = null;
 		this.url = null;
 		this.ontology = null;
+		this.processingNote = null;
 	}
 	
 	
 
 	@Override
 	public String toString() {
-		return "Vertex [id=" + id + ", lon=" + lon + ", lat=" + lat + ", label=" + label + "]";
+		return "Vertex [id=" + id + ", lon=" + lon + ", lat=" + lat + ", label=" + label + ", processingNote: " + processingNote + "]";
 	}
 
 

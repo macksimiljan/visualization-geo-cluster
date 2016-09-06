@@ -26,9 +26,14 @@ public class GeoJsonBuilder {
 		currColorIndex = ++currColorIndex % COLORS.length;
 		
 		// add points
-		cluster.add(buildPointAsFeature(c.lon, c.lat, c.label, COLORS[currColorIndex]));
+		cluster.add(buildPointAsFeature(c, COLORS[currColorIndex]));
 		for (Vertex v : set) {
-			cluster.add(buildPointAsFeature(v.lon, v.lat, v.label, COLORS[currColorIndex]));
+			if (v.lat == null || v.lon == null)
+				v.processingNote = "No GeoCoordinates!";
+			v.lat = (v.lat == null) ? c.lat : v.lat;
+			v.lon = (v.lon == null) ? c.lon : v.lon;
+			
+			cluster.add(buildPointAsFeature(v, COLORS[currColorIndex]));
 		}
 		
 		// add lines
@@ -58,26 +63,31 @@ public class GeoJsonBuilder {
 					&& point1.get(0) != null && point1.get(1) != null) {
 				coordinates.add(line);
 			}
+			else 
+				System.err.println("One edge point has no coordinates: start "+start+", end "+target);
 		}
 		
 		return buildMultiLineStringAsFeature(coordinates, "Gray", LINE_WEIGHT_BIG);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public JSONObject buildPointAsFeature(Double lon, Double lat, String name, String color) {
+	public JSONObject buildPointAsFeature(Vertex v, String color) {
 		JSONObject obj = new JSONObject();		
 		obj.put("type", "Feature");
 		
 		JSONObject geometry = new JSONObject();
 		geometry.put("type", "Point");
 		JSONArray coordinates = new JSONArray();
-		coordinates.add(lon);
-		coordinates.add(lat);
+		coordinates.add(v.lon);
+		coordinates.add(v.lat);
 		geometry.put("coordinates", coordinates);
 		obj.put("geometry", geometry);
 		
 		JSONObject properties = new JSONObject();
-		properties.put("name", name);
+		properties.put("name", v.label);
+		String description = "ID: "+v.id+"\nType: "+v.typeInternInput+"\nOntology: "+v.ontology;
+		description = (v.processingNote == null) ? description : description+"\nProcessing Note: "+v.processingNote; 
+		properties.put("description", description);
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
 		storageOptions.put("iconClass", ICON);
@@ -86,6 +96,32 @@ public class GeoJsonBuilder {
 		
 		return obj;	
 	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONObject buildPointAsFeature(ClusterRepresentative c, String color) {
+		JSONObject obj = new JSONObject();		
+		obj.put("type", "Feature");
+		
+		JSONObject geometry = new JSONObject();
+		geometry.put("type", "Point");
+		JSONArray coordinates = new JSONArray();
+		coordinates.add(c.lon);
+		coordinates.add(c.lat);
+		geometry.put("coordinates", coordinates);
+		obj.put("geometry", geometry);
+		
+		JSONObject properties = new JSONObject();
+		properties.put("name", c.label);
+		properties.put("description", "**Cluster Representative**\nID: "+c.id+"\nType: "+c.typeIntern);		
+		JSONObject storageOptions = new JSONObject();
+		storageOptions.put("color", color);
+		storageOptions.put("iconClass", ICON);
+		properties.put("_storage_options", storageOptions);
+		obj.put("properties", properties);
+		
+		return obj;	
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public JSONObject buildFeatureCollection(List<JSONObject> features) {
@@ -114,10 +150,15 @@ public class GeoJsonBuilder {
 				JSONArray line = new JSONArray();
 				line.add(point0);
 				line.add(point1);
-				if(point1.get(0)!= null && point1.get(1) != null)
-				coordinates.add(line);		
+				if (point1.get(0)!= null && point1.get(1) != null)
+					coordinates.add(line); // point within the cluster has coordinates: everything fine
+				else {
+					System.err.println("Point within the cluster has no coordinates: "+target);
+				}
 			}
-		}		
+		} else 
+			System.err.println("Cluster representative has no coordinates: "+start);
+		
 		return coordinates;
 	}
 	
@@ -130,8 +171,12 @@ public class GeoJsonBuilder {
 		JSONObject geometry = new JSONObject();
 		geometry.put("type", "MultiLineString");
 		
-		geometry.put("coordinates", coordinates);		
-		obj.put("geometry", geometry);
+		if (coordinates.size() == 0) {
+			obj.put("geometry", null);
+		} else {
+			geometry.put("coordinates", coordinates);	
+			obj.put("geometry", geometry);
+		}
 		
 		JSONObject properties = new JSONObject();
 		JSONObject storageOptions = new JSONObject();

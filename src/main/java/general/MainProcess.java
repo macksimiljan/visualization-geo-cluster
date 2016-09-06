@@ -31,7 +31,7 @@ public class MainProcess {
 		// file locations
 		final String vertexFileLoc = "./src/main/resources/vertexInput.geojson";
 		final String edgeFileLoc = "./src/main/resources/edgeInput.geojson";
-		final String clusterFileLoc = "./src/main/resources/mergedCluster.geojson";
+		final String clusterFileLoc = "./src/main/resources/small_mergedCluster.geojson";
 		final String newClustersLoc = "./src/main/resources/layer2.json";
 		final String oldClustersLoc = "./src/main/resources/layer1.json";
 		
@@ -69,20 +69,15 @@ public class MainProcess {
 				
 				Set<Vertex> otherNodes = new HashSet<Vertex>();
 				for (Long id : clusterRepr.clusteredVertexIds) {
-					if (id == clusterRepr.id)
-						continue;
-					
 					Vertex v = dictVertex.getVertexById(id);
-					otherNodes.add(v);
-					
+					otherNodes.add(v);					
 					try {
 						edges.addAll(dictEdge.getEdgeByStartId(id));
 					} catch (Exception e) {
 						System.err.println(e.getMessage());
-					}
-					
+					}					
 				}
-			
+							
 				// build geojson objects of new clusters
 				featuresNew.addAll(geo.buildCluster(clusterRepr, otherNodes));
 				
