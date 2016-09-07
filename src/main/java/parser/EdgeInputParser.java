@@ -14,6 +14,11 @@ import representation.InputEdge;
  */
 public class EdgeInputParser {
 	
+	/**
+	 * Parses a string representing a JSON object as an InputEdge object.
+	 * @param line JSON object of an edge.
+	 * @return Edge.
+	 */
 	public InputEdge parseLine(String line) {
 		JSONParser parser = new JSONParser();
 		InputEdge e = new InputEdge();

@@ -13,11 +13,24 @@ import java.util.Set;
 import parser.EdgeInputParser;
 import representation.InputEdge;
 
+/**
+ * Dictionary for edges.
+ * 
+ * @author MM
+ *
+ */
 public class EdgeDict {
 	
+	/** The edge file. */
 	final private File file;
+	/** The dictionary. */
 	private Map<Long, Set<InputEdge>> dict;
 	
+	/**
+	 * Constructor.
+	 * @param edgeFileLoc Location of the edge file.
+	 * @throws IOException If file could not be found.
+	 */
 	public EdgeDict(String edgeFileLoc) throws IOException {
 		this.file = new File(edgeFileLoc);
 		if (!this.file.exists())
@@ -28,6 +41,12 @@ public class EdgeDict {
 		this.loadDict();
 	}
 	
+	/**
+	 * Returns edges for a given vertex ID as start point.
+	 * @param id Start point ID.
+	 * @return Set of edges.
+	 * @throws NullPointerException If the dictionary contains no edges for that start ID.
+	 */
 	public Set<InputEdge> getEdgeByStartId(Long id) throws NullPointerException {
 		Set<InputEdge> edges = dict.get(id);
 		if (edges == null)
@@ -36,10 +55,19 @@ public class EdgeDict {
 		return dict.get(id);
 	}
 	
+	/**
+	 * Returns IDs of the start vertices of all edges.
+	 * @return Set of vertex IDs.
+	 */
 	public Set<Long> getAllIds() {
 		return dict.keySet();
 	}
 	
+	/**
+	 * Returns edges starting from one of the vertices represented by the given IDs.
+	 * @param vertexIds Start point IDs.
+	 * @return Set of edges.
+	 */
 	public Set<InputEdge> getEdgesByVertexIds(Set<Long> vertexIds) {
 		Set<InputEdge> edges = new HashSet<InputEdge>();
 		
@@ -50,6 +78,11 @@ public class EdgeDict {
 		return edges;
 	}
 	
+	/**
+	 * Loads the dictionary.
+	 * @throws FileNotFoundException If file path is wrong.
+	 * @throws IOException If an error occurs while reading the file.
+	 */
 	private void loadDict() throws FileNotFoundException, IOException {
 		try(BufferedReader reader = new BufferedReader(new FileReader(file));) {
 			EdgeInputParser parser = new EdgeInputParser();

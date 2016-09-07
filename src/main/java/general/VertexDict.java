@@ -12,9 +12,17 @@ import java.util.Set;
 import parser.VertexInputParser;
 import representation.Vertex;
 
+/**
+ * Dictionary for vertices.
+ * 
+ * @author MM
+ *
+ */
 public class VertexDict {
 	
+	/** The vertex file. */
 	final private File file;
+	/** The dictionary. */
 	private Map<Long, Vertex> dict;
 
 	/**
@@ -51,8 +59,8 @@ public class VertexDict {
 	
 	/**
 	 * Loads the input vertex dictionary.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws FileNotFoundException If file path is wrong.
+	 * @throws IOException If an error occurs while reading the file.
 	 */
 	private void loadDict() throws FileNotFoundException, IOException {
 		try(BufferedReader reader = new BufferedReader(new FileReader(file));) {

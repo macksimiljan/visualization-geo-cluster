@@ -10,16 +10,34 @@ import representation.ClusterRepresentative;
 import representation.InputEdge;
 import representation.Vertex;
 
+/**
+ * Builder for GeoJSON objects and arrays.
+ * 
+ * @author MM
+ *
+ */
 public class GeoJsonBuilder {
 	
+	/** Colors of the clusters. */
 	final private static String[] COLORS = {"SeaGreen", "Chocolate", "LightSeaGreen", "MediumBlue", "FireBrick", "DodgerBlue", "Orchid"};
+	/** Current color index. */
 	private static int currColorIndex = 0;
+	/** Icon of geo-points within uMap. */
 	final private static String ICON = "Drop";
+	/** Big edge weight. */
 	final private static String LINE_WEIGHT_BIG = "10";
+	/** Small edge weight. */
 	final private static String LINE_WEIGHT_SMALL = "4";
+	/** Edge opacity. */
 	final private static String LINE_OPACITY = "0.8";
 	
 	
+	/**
+	 * Builds a GeoJSON array as the representation of a cluster.
+	 * @param c Cluster representative.
+	 * @param set Vertices within the cluster.
+	 * @return Cluster as GeoJSON array.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONArray buildCluster(ClusterRepresentative c, Set<Vertex> set) {
 		JSONArray cluster = new JSONArray();
@@ -42,6 +60,12 @@ public class GeoJsonBuilder {
 		return cluster;
 	}
 	
+	/**
+	 * Builds a GeoJSON object as the representation of the original links between geo-objects.
+	 * @param dict Vertex dictionary.
+	 * @param edges Original links.
+	 * @return Original links as GeoJSON object.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject buildOldStructure(VertexDict dict, Set<InputEdge> edges) {
 		JSONArray coordinates = new JSONArray();
@@ -70,6 +94,12 @@ public class GeoJsonBuilder {
 		return buildMultiLineStringAsFeature(coordinates, "Gray", LINE_WEIGHT_BIG);
 	}
 	
+	/**
+	 * Builds a GeoJSON point as a feature. 
+	 * @param v Vertex as the point.
+	 * @param color Color of the point.
+	 * @return GeoJSON point as a feature.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject buildPointAsFeature(Vertex v, String color) {
 		JSONObject obj = new JSONObject();		
@@ -97,6 +127,12 @@ public class GeoJsonBuilder {
 		return obj;	
 	}
 	
+	/**
+	 * Builds a GeoJSON point as a feature.
+	 * @param c Cluster representative.
+	 * @param color Color of the cluster representative.
+	 * @return GeoJSON point as a feature.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject buildPointAsFeature(ClusterRepresentative c, String color) {
 		JSONObject obj = new JSONObject();		
@@ -122,7 +158,11 @@ public class GeoJsonBuilder {
 		return obj;	
 	}
 	
-	
+	/**
+	 * Builds a feature collection from a list of features.
+	 * @param features Features as JSON objects.
+	 * @return Feature collection.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject buildFeatureCollection(List<JSONObject> features) {
 		JSONObject obj = new JSONObject();
@@ -134,6 +174,12 @@ public class GeoJsonBuilder {
 		return obj;
 	}
 	
+	/**
+	 * Builds JSON array containing the links between each cluster vertex to the representative.
+	 * @param start Cluster representative.
+	 * @param targets Vertices within the cluster.
+	 * @return JSON array for coordinates of MultiLine object.
+	 */
 	@SuppressWarnings("unchecked")
 	private JSONArray buildCoordinatesForCluster(Vertex start, Set<Vertex> targets) {
 		JSONArray coordinates = new JSONArray();		
@@ -162,7 +208,13 @@ public class GeoJsonBuilder {
 		return coordinates;
 	}
 	
-	
+	/**
+	 * Builds a MultiLineString object as a feature.
+	 * @param coordinates Coordinates of the MultiLineString.
+	 * @param color Color of the lines.
+	 * @param lineWeight Weight of the lines.
+	 * @return MultiLineString object.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject buildMultiLineStringAsFeature(JSONArray coordinates, String color, String lineWeight) {
 		JSONObject obj = new JSONObject();

@@ -3,19 +3,36 @@ package representation;
 import java.util.HashSet;
 import java.util.Set;
 
+/** 
+ * Vertex.
+ * 
+ * @author MM
+ *
+ */
 public class Vertex {
 
+	/** Vertex ID. */
 	public Long id;
+	/** Types of this vertex, e.g. Settlement.*/
 	public Set<String> typeInternInput;
+	/** ... */
 	public Float vertexAggSimValue;
+	/** ... */
 	public Long ccId;
+	/** Longitude value of this vertex. */
 	public Double lon;
+	/** Latitude value of this vertex. */
 	public Double lat;
+	/** Label of this vertex, e.g. name of the city.*/
 	public String label;
+	/** URL of this vertex. */
 	public String url;
+	/** Ontology from which the vertex has been extracted.*/
 	public String ontology;
+	/** Intern processing note. Added during generation of the output file for visualisation. */
 	public String processingNote;
 	
+	/** Constructor.*/
 	public Vertex() {
 		this.id = null;
 		this.typeInternInput = new HashSet<String>();

@@ -12,13 +12,19 @@ import representation.Vertex;
 
 /**
  * Parses data in 'vertexInput.geojson'.
+ * 
  * @author MM
  *
  */
 public class VertexInputParser {
 	
 	
-	
+	/**
+	 * Parses a string representing a JSON object as an InputEdge object.
+	 * @param line JSON object of a vertex.
+	 * @return Vertex.
+	 */
+	@SuppressWarnings("rawtypes")
 	public Vertex parseLine(String line) {
 		JSONParser parser = new JSONParser();
 		Vertex v = new Vertex();
