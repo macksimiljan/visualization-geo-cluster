@@ -44,7 +44,24 @@ public class GeoJsonBuilder {
 		currColorIndex = ++currColorIndex % COLORS.length;
 		
 		// add points
-		cluster.add(buildPointAsFeature(c, COLORS[currColorIndex]));
+		if (c.lat != null && c.lon != null) {
+			cluster.add(buildPointAsFeature(c, COLORS[currColorIndex]));
+		} else {
+			// cluster representative has no coordinates
+			for (Vertex v : set) {
+				if (v.lat == null || v.lon == null) {
+					continue;
+				} else {
+					c.lat = v.lat;
+					c.lon = v.lon;
+					c.processingNote = "No GeoCoordinates!";
+					break;
+				}
+			}
+			// no vertex within the cluster has coordinates
+			if (c.lat != null && c.lon != null)
+				System.err.println("No coordinates for the cluster representative: "+c);			
+		}
 		for (Vertex v : set) {
 			if (v.lat == null || v.lon == null)
 				v.processingNote = "No GeoCoordinates!";
@@ -56,6 +73,9 @@ public class GeoJsonBuilder {
 		
 		// add lines
 		cluster.add(buildMultiLineStringAsFeature(buildCoordinatesForCluster(c, set), COLORS[currColorIndex], LINE_WEIGHT_SMALL));
+		
+		// add cluster marker
+		cluster.add(buildClusterMarkerAsFeature(c, COLORS[currColorIndex]));
 		
 		return cluster;
 	}
@@ -157,6 +177,64 @@ public class GeoJsonBuilder {
 		
 		return obj;	
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	private JSONObject buildClusterMarkerAsFeature(ClusterRepresentative c, String color) {
+		JSONObject obj = new JSONObject();
+		obj.put("type", "Feature");
+		
+		JSONObject geometry = new JSONObject();
+		geometry.put("type", "Polygon");
+		geometry.put("coordinates", buildCoordinatesForMarker(c));
+		obj.put("geometry", geometry);
+		
+		JSONObject properties = new JSONObject();
+		properties.put("name", c.label);
+		JSONObject storageOptions = new JSONObject();
+		storageOptions.put("color", color);
+		properties.put("_storage_options", storageOptions);
+		obj.put("properties", properties);
+		
+		return obj;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private JSONArray buildCoordinatesForMarker(ClusterRepresentative c) throws IllegalArgumentException {
+		JSONArray outer = new JSONArray();		
+		
+		if (c.lon != null && c.lat != null) {
+			JSONArray a = new JSONArray();
+			
+			JSONArray point1 = new JSONArray();
+			point1.add(this.round(c.lon + 0.025));
+			point1.add(this.round(c.lat));		
+			JSONArray point2 = new JSONArray();
+			point2.add(this.round(c.lon));
+			point2.add(this.round(c.lat + 0.025));
+			JSONArray point3 = new JSONArray();
+			point3.add(this.round(c.lon - 0.025));
+			point3.add(this.round(c.lat));
+			JSONArray point4 = new JSONArray();
+			point4.add(this.round(c.lon));
+			point4.add(this.round(c.lat - 0.025));
+			
+			a.add(point1);
+			a.add(point2);
+			a.add(point3);
+			a.add(point4);
+			outer.add(a);
+		} else {
+			System.err.println("Cannot calculate marker for cluster representative without coordinates!");
+		}
+		
+		return outer;
+	}
+	
+	private Double round(Double d) {
+		return Math.round(d*100000)/100000.0;
+	}
+	
 	
 	/**
 	 * Builds a feature collection from a list of features.
