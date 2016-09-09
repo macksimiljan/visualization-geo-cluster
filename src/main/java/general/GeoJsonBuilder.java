@@ -3,6 +3,7 @@ package general;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -18,6 +19,9 @@ import representation.Vertex;
  */
 public class GeoJsonBuilder {
 	
+	/** Log4j Logger */
+	public static Logger log = Logger.getLogger(GeoJsonBuilder.class);
+	
 	/** Colors of the clusters. */
 	final private static String[] COLORS = {"SeaGreen", "Chocolate", "LightSeaGreen", "MediumBlue", "FireBrick", "DodgerBlue", "Orchid"};
 	/** Current color index. */
@@ -30,6 +34,8 @@ public class GeoJsonBuilder {
 	final private static String LINE_WEIGHT_SMALL = "4";
 	/** Edge opacity. */
 	final private static String LINE_OPACITY = "0.8";
+	/** Original link color. */
+	final private static String COLOR_ORIGINAL = "Gray";
 	
 	
 	/**
@@ -60,7 +66,7 @@ public class GeoJsonBuilder {
 			}
 			// no vertex within the cluster has coordinates
 			if (c.lat != null && c.lon != null)
-				System.err.println("No coordinates for the cluster representative: "+c);			
+				log.debug("No coordinates for the cluster representative: "+c);			
 		}
 		for (Vertex v : set) {
 			if (v.lat == null || v.lon == null)
@@ -108,10 +114,10 @@ public class GeoJsonBuilder {
 				coordinates.add(line);
 			}
 			else 
-				System.err.println("One edge point has no coordinates: start "+start+", end "+target);
+				log.debug("One edge point has no coordinates: start "+start+", end "+target);
 		}
 		
-		return buildMultiLineStringAsFeature(coordinates, "Gray", LINE_WEIGHT_BIG);
+		return buildMultiLineStringAsFeature(coordinates, COLOR_ORIGINAL, LINE_WEIGHT_BIG);
 	}
 	
 	/**
@@ -207,17 +213,17 @@ public class GeoJsonBuilder {
 			JSONArray a = new JSONArray();
 			
 			JSONArray point1 = new JSONArray();
-			point1.add(this.round(c.lon + 0.025));
+			point1.add(this.round(c.lon + 0.01));
 			point1.add(this.round(c.lat));		
 			JSONArray point2 = new JSONArray();
 			point2.add(this.round(c.lon));
-			point2.add(this.round(c.lat + 0.025));
+			point2.add(this.round(c.lat + 0.01));
 			JSONArray point3 = new JSONArray();
-			point3.add(this.round(c.lon - 0.025));
+			point3.add(this.round(c.lon - 0.01));
 			point3.add(this.round(c.lat));
 			JSONArray point4 = new JSONArray();
 			point4.add(this.round(c.lon));
-			point4.add(this.round(c.lat - 0.025));
+			point4.add(this.round(c.lat - 0.01));
 			
 			a.add(point1);
 			a.add(point2);
@@ -225,7 +231,7 @@ public class GeoJsonBuilder {
 			a.add(point4);
 			outer.add(a);
 		} else {
-			System.err.println("Cannot calculate marker for cluster representative without coordinates!");
+			log.debug("Cannot calculate marker for cluster representative without coordinates!");
 		}
 		
 		return outer;
@@ -277,11 +283,11 @@ public class GeoJsonBuilder {
 				if (point1.get(0)!= null && point1.get(1) != null)
 					coordinates.add(line); // point within the cluster has coordinates: everything fine
 				else {
-					System.err.println("Point within the cluster has no coordinates: "+target);
+					log.debug("Point within the cluster has no coordinates: "+target);
 				}
 			}
 		} else 
-			System.err.println("Cluster representative has no coordinates: "+start);
+			log.debug("Cluster representative has no coordinates: "+start);
 		
 		return coordinates;
 	}
@@ -314,6 +320,7 @@ public class GeoJsonBuilder {
 		storageOptions.put("weight", lineWeight);
 		storageOptions.put("opacity", LINE_OPACITY);
 		properties.put("_storage_options", storageOptions);
+		properties.put("name", (color.equals(COLOR_ORIGINAL)) ? "original link" : "new cluster link");
 		obj.put("properties", properties);
 		
 		return obj;

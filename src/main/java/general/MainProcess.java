@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import parser.MergedClusterParser;
@@ -26,12 +27,15 @@ import representation.Vertex;
  */
 public class MainProcess {
 	
+	/** Log4j Logger */
+	public static Logger log = Logger.getLogger(MainProcess.class);
+	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		// file locations
 		final String vertexFileLoc = "./src/main/resources/vertexInput.geojson";
 		final String edgeFileLoc = "./src/main/resources/edgeInput.geojson";
-		final String clusterFileLoc = "./src/main/resources/half_mergedCluster.geojson";
+		final String clusterFileLoc = "./src/main/resources/mergedCluster.geojson";
 		final String newClustersLoc = "./src/main/resources/layer2.json";
 		final String oldClustersLoc = "./src/main/resources/layer1.json";
 		
@@ -64,7 +68,7 @@ public class MainProcess {
 				try {
 					edges.addAll(dictEdge.getEdgeByStartId(clusterRepr.id));
 				} catch (Exception e) {
-					System.err.println(e.getMessage());
+					log.debug(e.getMessage());
 				}
 				
 				Set<Vertex> otherNodes = new HashSet<Vertex>();
@@ -74,7 +78,7 @@ public class MainProcess {
 					try {
 						edges.addAll(dictEdge.getEdgeByStartId(id));
 					} catch (Exception e) {
-						System.err.println(e.getMessage());
+						log.debug(e.getMessage());
 					}					
 				}
 							
@@ -110,7 +114,7 @@ public class MainProcess {
 			writerOldStructure.print("]\n}");
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 		
 		System.out.println("--- end ---");
