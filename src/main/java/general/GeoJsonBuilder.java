@@ -45,7 +45,7 @@ public class GeoJsonBuilder {
 	 * @return Cluster as GeoJSON array.
 	 */
 	@SuppressWarnings("unchecked")
-	public JSONArray buildCluster(ClusterRepresentative c, Set<Vertex> set) {
+	public JSONArray buildCluster(ClusterRepresentative c, Set<Vertex> set) throws IllegalArgumentException {
 		JSONArray cluster = new JSONArray();
 		currColorIndex = ++currColorIndex % COLORS.length;
 		
@@ -68,11 +68,17 @@ public class GeoJsonBuilder {
 			if (c.lat != null && c.lon != null)
 				log.debug("No coordinates for the cluster representative: "+c);			
 		}
+		if (c.lat !=null && c.lon != null && (c.lat > 180 || c.lat < -180 || c.lon > 180 || c.lon < -180))
+			throw new IllegalArgumentException("Illegal coordinates: "+c);
+		
 		for (Vertex v : set) {
 			if (v.lat == null || v.lon == null)
 				v.processingNote = "No GeoCoordinates!";
 			v.lat = (v.lat == null) ? c.lat : v.lat;
 			v.lon = (v.lon == null) ? c.lon : v.lon;
+			
+			if (v.lat != null && v.lon != null && (v.lat > 180 || v.lat < -180 || v.lon > 180 || v.lon < -180))
+				throw new IllegalArgumentException("Illegal coordinates: "+v);
 			
 			cluster.add(buildPointAsFeature(v, COLORS[currColorIndex]));
 		}
@@ -86,6 +92,8 @@ public class GeoJsonBuilder {
 		return cluster;
 	}
 	
+	
+	
 	/**
 	 * Builds a GeoJSON object as the representation of the original links between geo-objects.
 	 * @param dict Vertex dictionary.
@@ -93,7 +101,7 @@ public class GeoJsonBuilder {
 	 * @return Original links as GeoJSON object.
 	 */
 	@SuppressWarnings("unchecked")
-	public JSONObject buildOldStructure(VertexDict dict, Set<InputEdge> edges) {
+	public JSONObject buildOldStructure(VertexDict dict, Set<InputEdge> edges) throws IllegalArgumentException {
 		JSONArray coordinates = new JSONArray();
 		for (InputEdge edge : edges) {
 			Vertex start = dict.getVertexById(edge.source);
@@ -110,14 +118,56 @@ public class GeoJsonBuilder {
 			line.add(point1);
 			
 			if (point0.get(0) != null && point0.get(1) != null
-					&& point1.get(0) != null && point1.get(1) != null) {
+					&& point1.get(0) != null && point1.get(1) != null) {				
+				
+				if (start.lat > 180 || start.lat < -180 || start.lon > 180 || start.lon < -180)
+					throw new IllegalArgumentException("Illegal coordinates: "+start);
+				if (target.lat > 180 || target.lat < -180 || target.lon > 180 || target.lon < -180)
+					throw new IllegalArgumentException("Illegal coordinates: "+target);
+				
 				coordinates.add(line);
+				
 			}
 			else 
 				log.debug("One edge point has no coordinates: start "+start+", end "+target);
 		}
 		
 		return buildMultiLineStringAsFeature(coordinates, COLOR_ORIGINAL, LINE_WEIGHT_BIG);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONArray buildOldStructureWithSimVal(VertexDict dict, Set<InputEdge> edges) throws IllegalArgumentException {
+		JSONArray a = new JSONArray();
+		
+		for (InputEdge edge : edges) {
+			Vertex start = dict.getVertexById(edge.source);
+			Vertex target = dict.getVertexById(edge.target);
+			JSONArray point0 = new JSONArray();
+			point0.add(start.lon);
+			point0.add(start.lat);
+			JSONArray point1 = new JSONArray();
+			point1.add(target.lon);
+			point1.add(target.lat);
+			
+			JSONArray coordinates = new JSONArray();
+			if (point0.get(0) != null && point0.get(1) != null
+					&& point1.get(0) != null && point1.get(1) != null) {				
+
+				if (start.lat > 180 || start.lat < -180 || start.lon > 180 || start.lon < -180)
+					throw new IllegalArgumentException("Illegal coordinates: "+start);
+				if (target.lat > 180 || target.lat < -180 || target.lon > 180 || target.lon < -180)
+					throw new IllegalArgumentException("Illegal coordinates: "+target);
+				
+				coordinates.add(point0);
+				coordinates.add(point1);
+			}
+			else 
+				log.debug("One edge point has no coordinates: start "+start+", end "+target);
+			
+			a.add(buildLineStringAsFeature(coordinates, "aggSimValue: "+edge.aggsimValue, COLOR_ORIGINAL, LINE_WEIGHT_BIG));
+		}
+		
+		return a;
 	}
 	
 	/**
@@ -174,7 +224,7 @@ public class GeoJsonBuilder {
 		
 		JSONObject properties = new JSONObject();
 		properties.put("name", c.label);
-		properties.put("description", "**Cluster Representative**\nID: "+c.id+"\nType: "+c.typeIntern);		
+		properties.put("description", "**Cluster Representative**\nID: "+c.id+"\nType: "+c.typeIntern+"\nVertices: "+c.clusteredVertexIds);		
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
 		storageOptions.put("iconClass", ICON);
@@ -321,6 +371,34 @@ public class GeoJsonBuilder {
 		storageOptions.put("opacity", LINE_OPACITY);
 		properties.put("_storage_options", storageOptions);
 		properties.put("name", (color.equals(COLOR_ORIGINAL)) ? "original link" : "new cluster link");
+		obj.put("properties", properties);
+		
+		return obj;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONObject buildLineStringAsFeature(JSONArray coordinates, String description, String color, String lineWeight) {
+		JSONObject obj = new JSONObject();
+		obj.put("type", "Feature");
+		
+		JSONObject geometry = new JSONObject();
+		geometry.put("type", "LineString");
+		
+		if (coordinates.size() == 0) {
+			obj.put("geometry", null);
+		} else {
+			geometry.put("coordinates", coordinates);	
+			obj.put("geometry", geometry);
+		}
+		
+		JSONObject properties = new JSONObject();
+		JSONObject storageOptions = new JSONObject();
+		storageOptions.put("color", color);
+		storageOptions.put("weight", lineWeight);
+		storageOptions.put("opacity", LINE_OPACITY);
+		properties.put("_storage_options", storageOptions);
+		properties.put("name", (color.equals(COLOR_ORIGINAL)) ? "original link" : "new cluster link");
+		properties.put("description", description);
 		obj.put("properties", properties);
 		
 		return obj;

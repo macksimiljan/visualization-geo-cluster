@@ -35,7 +35,7 @@ public class MainProcess {
 		// file locations
 		final String vertexFileLoc = "./src/main/resources/vertexInput.geojson";
 		final String edgeFileLoc = "./src/main/resources/edgeInput.geojson";
-		final String clusterFileLoc = "./src/main/resources/mergedCluster.geojson";
+		final String clusterFileLoc = "./src/main/resources/500_mergedCluster.geojson";
 		final String newClustersLoc = "./src/main/resources/layer2.json";
 		final String oldClustersLoc = "./src/main/resources/layer1.json";
 		
@@ -83,15 +83,22 @@ public class MainProcess {
 				}
 							
 				// build geojson objects of new clusters
-				featuresNew.addAll(geo.buildCluster(clusterRepr, otherNodes));
+				try {
+					featuresNew.addAll(geo.buildCluster(clusterRepr, otherNodes));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				
 				// build geojson object for the old structure
-				featuresOld.add(geo.buildOldStructure(dictVertex, edges));
-				
+				try {
+					featuresOld.addAll(geo.buildOldStructureWithSimVal(dictVertex, edges));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			
 			// save geojson objects of new clusters
-			System.out.println("|features| = "+featuresNew.size());			
+			System.out.println("|featuresNew| = "+featuresNew.size());		
 			System.out.println("Writing to "+newClustersLoc+" ... ");
 			writerCluster.println("{\n\"type\": \"FeatureCollection\",\n\"features\": [");
 			for (int i = 0; i < featuresNew.size(); i++) {
@@ -103,6 +110,7 @@ public class MainProcess {
 			writerCluster.print("]\n}");
 			
 			// save gepjson objects of old structure
+			System.out.println("|featuresOld| = "+featuresOld.size());	
 			System.out.println("Writing to "+oldClustersLoc+" ... ");
 			writerOldStructure.println("{\n\"type\": \"FeatureCollection\",\n\"features\": [");
 			for (int i = 0; i < featuresOld.size(); i++) {
