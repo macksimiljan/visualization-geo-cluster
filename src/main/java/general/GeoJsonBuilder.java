@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import dict.VertexDict;
 import representation.ClusterRepresentative;
 import representation.InputEdge;
 import representation.Vertex;
@@ -66,7 +67,7 @@ public class GeoJsonBuilder {
 			}
 			// no vertex within the cluster has coordinates
 			if (c.lat != null && c.lon != null)
-				log.debug("No coordinates for the cluster representative: "+c);			
+				log.error("No coordinates for the cluster representative: "+c);			
 		}
 		if (c.lat !=null && c.lon != null && (c.lat > 180 || c.lat < -180 || c.lon > 180 || c.lon < -180))
 			throw new IllegalArgumentException("Illegal coordinates: "+c);
@@ -87,7 +88,7 @@ public class GeoJsonBuilder {
 		cluster.add(buildMultiLineStringAsFeature(buildCoordinatesForCluster(c, set), COLORS[currColorIndex], LINE_WEIGHT_SMALL));
 		
 		// add cluster marker
-		cluster.add(buildClusterMarkerAsFeature(c, COLORS[currColorIndex]));
+//		cluster.add(buildClusterMarkerAsFeature(c, COLORS[currColorIndex]));
 		
 		return cluster;
 	}
@@ -223,7 +224,7 @@ public class GeoJsonBuilder {
 		obj.put("geometry", geometry);
 		
 		JSONObject properties = new JSONObject();
-		properties.put("name", c.label);
+		properties.put("name", "*" + c.label + "*");
 		properties.put("description", "**Cluster Representative**\nID: "+c.id+"\nType: "+c.typeIntern+"\nVertices: "+c.clusteredVertexIds);		
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
@@ -281,7 +282,7 @@ public class GeoJsonBuilder {
 			a.add(point4);
 			outer.add(a);
 		} else {
-			log.debug("Cannot calculate marker for cluster representative without coordinates!");
+			log.error("Cannot calculate marker for cluster representative without coordinates!");
 		}
 		
 		return outer;

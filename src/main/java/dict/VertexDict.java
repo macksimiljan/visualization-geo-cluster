@@ -1,4 +1,4 @@
-package general;
+package dict;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,8 +23,10 @@ public class VertexDict {
 	
 	/** The vertex file. */
 	final private File file;
-	/** The dictionary. */
+	/** The dictionary: vertexId to Vertex. */
 	private Map<Long, Vertex> dict;
+	/** Another dictionary: original cluster Id ccID to set of original cluster vertices.*/
+	private Map<Long, Set<Long>> dictCcId;
 
 	/**
 	 * Constructor.
@@ -36,8 +39,9 @@ public class VertexDict {
 			throw new FileNotFoundException("Could not find file "+vertexFileLoc);
 		
 		dict = new HashMap<Long, Vertex>();
+		dictCcId = new HashMap<Long, Set<Long>>();
 		
-		this.loadDict();
+		this.loadDicts();
 	}
 	
 	/**
@@ -47,6 +51,14 @@ public class VertexDict {
 	 */
 	public Vertex getVertexById(Long id) {
 		return dict.get(id);
+	}
+	
+	public Set<Long> getVertexIdsByCcId(Long ccId) {
+		return dictCcId.get(ccId);
+	}
+	
+	public Set<Long> getAllCcIds() {
+		return dictCcId.keySet();
 	}
 	
 	/**
@@ -62,15 +74,30 @@ public class VertexDict {
 	 * @throws FileNotFoundException If file path is wrong.
 	 * @throws IOException If an error occurs while reading the file.
 	 */
-	private void loadDict() throws FileNotFoundException, IOException {
+	private void loadDicts() throws FileNotFoundException, IOException {
 		try(BufferedReader reader = new BufferedReader(new FileReader(file));) {
 			VertexInputParser parser = new VertexInputParser();
 			String line = null;
 			while ( (line = reader.readLine()) != null) {
 				Vertex vertex = parser.parseLine(line);
+				
+				// fill dictionary
 				Vertex prev = dict.put(vertex.id, vertex);
 				if (prev != null)
 					throw new IOException("Duplicated ID!");
+				
+				// fill second dictionary
+				Long ccId = vertex.ccId;
+				if (dictCcId.containsKey(ccId)) {
+					Set<Long> val = dictCcId.get(ccId);
+					val.add(vertex.id);
+					dictCcId.put(ccId, val);
+				} else {
+					Set<Long> val = new HashSet<Long>();
+					val.add(vertex.id);
+					dictCcId.put(ccId, val);
+				}
+				
 			}
 		}
 	}

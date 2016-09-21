@@ -48,6 +48,7 @@ public class VertexInputParser {
 					v.lon = ((Long)data.get("lon")).doubleValue();
 				}
 			}
+			v.ccId = (Long)data.get("ccId");
 			v.ontology = (String)data.get("ontology");
 			v.typeInternInput = new HashSet<String>();
 			JSONArray typeInterns = (JSONArray)data.get("typeIntern");

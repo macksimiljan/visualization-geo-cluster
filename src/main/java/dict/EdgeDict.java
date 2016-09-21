@@ -1,4 +1,4 @@
-package general;
+package dict;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import parser.EdgeInputParser;
 import representation.InputEdge;
 
@@ -20,6 +22,9 @@ import representation.InputEdge;
  *
  */
 public class EdgeDict {
+	
+	/** Log4j Logger */
+	public static Logger log = Logger.getLogger(EdgeDict.class);
 	
 	/** The edge file. */
 	final private File file;
@@ -72,7 +77,11 @@ public class EdgeDict {
 		Set<InputEdge> edges = new HashSet<InputEdge>();
 		
 		for (Long id : vertexIds) {
-			edges.addAll(this.getEdgeByStartId(id));
+			try {
+				edges.addAll(this.getEdgeByStartId(id));
+			} catch (Exception e) {
+				log.debug(e.getMessage());
+			}
 		}
 		
 		return edges;
