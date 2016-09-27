@@ -23,6 +23,8 @@ public class RepresentativeDict {
 	final private File file;
 	/** The dictionary: merged cluster id to representative. */
 	private Map<Long, ClusterRepresentative> dict;
+	/** Another dictionary: cluster vertex id to its representative. */
+	private Map<Long, ClusterRepresentative> dictV;
 	
 	public RepresentativeDict(String mergedClusterFileLoc) throws IOException {
 		this.file = new File(mergedClusterFileLoc);
@@ -30,14 +32,33 @@ public class RepresentativeDict {
 			throw new FileNotFoundException("Could not find file "+mergedClusterFileLoc);
 		
 		dict = new HashMap<Long, ClusterRepresentative>();
+		dictV = new HashMap<Long, ClusterRepresentative>();
 				
 		this.loadDict();
 	}
 	
+	/**
+	 * Return cluster representative by its ID.
+	 * @param id Representative ID.
+	 * @return Cluster representative.
+	 */
 	public ClusterRepresentative getRepresentativeById(Long id) {
 		return dict.get(id);
 	}
 	
+	/**
+	 * Returns the cluster representative of a cluster by one of the cluster vertices.
+	 * @param vertexId Vertex ID.
+	 * @return Cluster representative.
+	 */
+	public ClusterRepresentative getRepresentativeByItsVertexId(Long vertexId) {
+		return dictV.get(vertexId);
+	}
+	
+	/**
+	 * Return all IDs of cluster representatives.
+	 * @return IDs of representatives.
+	 */
 	public Set<Long> getAllIds() {
 		return dict.keySet();
 	}
@@ -52,7 +73,13 @@ public class RepresentativeDict {
 				// fill dictionary
 				ClusterRepresentative prev = dict.put(r.id, r);
 				if (prev != null)
-					log.error("Duplicated ID for representative ID: "+r.id+"!");				
+					log.error("Duplicated ID for representative ID: "+r.id+"!");
+				// fill the other dictionary
+				for (Long vertexId : r.clusteredVertexIds) {
+					prev = dictV.put(vertexId, r);
+					if (prev != null)
+						log.error("Vertex, id="+vertexId+", is part of two clusters!");
+				}
 			}
 		}
 	}

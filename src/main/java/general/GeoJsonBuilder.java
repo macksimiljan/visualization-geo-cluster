@@ -44,6 +44,7 @@ public class GeoJsonBuilder {
 	 * @param c Cluster representative.
 	 * @param set Vertices within the cluster.
 	 * @return Cluster as GeoJSON array.
+	 * @throws IllegalArgumentException If the coordinates of at least one vertex are illegal.
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONArray buildCluster(ClusterRepresentative c, Set<Vertex> set) throws IllegalArgumentException {
@@ -66,10 +67,10 @@ public class GeoJsonBuilder {
 				}
 			}
 			// no vertex within the cluster has coordinates
-			if (c.lat != null && c.lon != null)
-				log.error("No coordinates for the cluster representative: "+c);			
+			if (c.lat == null && c.lon == null)
+				throw new IllegalArgumentException("No coordinates for the cluster representative: "+c);
 		}
-		if (c.lat !=null && c.lon != null && (c.lat > 180 || c.lat < -180 || c.lon > 180 || c.lon < -180))
+		if (c.lat != null && c.lon != null && (c.lat > 180 || c.lat < -180 || c.lon > 180 || c.lon < -180))
 			throw new IllegalArgumentException("Illegal coordinates: "+c);
 		
 		for (Vertex v : set) {
@@ -163,7 +164,7 @@ public class GeoJsonBuilder {
 				coordinates.add(point1);
 			}
 			else 
-				log.debug("One edge point has no coordinates: start "+start+", end "+target);
+				log.error("One edge point has no coordinates: start "+start+", end "+target);
 			
 			a.add(buildLineStringAsFeature(coordinates, "aggSimValue: "+edge.aggsimValue, COLOR_ORIGINAL, LINE_WEIGHT_BIG));
 		}
@@ -192,7 +193,7 @@ public class GeoJsonBuilder {
 		
 		JSONObject properties = new JSONObject();
 		properties.put("name", v.label);
-		String description = "ID: "+v.id+"\nType: "+v.typeInternInput+"\nOntology: "+v.ontology;
+		String description = "ID: "+v.id+"\nType: "+v.typeInternInput+"\nOntology: "+v.ontology+"\nccId: "+v.ccId;
 		description = (v.processingNote == null) ? description : description+"\nProcessing Note: "+v.processingNote; 
 		properties.put("description", description);
 		JSONObject storageOptions = new JSONObject();
@@ -224,11 +225,11 @@ public class GeoJsonBuilder {
 		obj.put("geometry", geometry);
 		
 		JSONObject properties = new JSONObject();
-		properties.put("name", "*" + c.label + "*");
+		properties.put("name", c.label);
 		properties.put("description", "**Cluster Representative**\nID: "+c.id+"\nType: "+c.typeIntern+"\nVertices: "+c.clusteredVertexIds);		
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
-		storageOptions.put("iconClass", ICON);
+//		storageOptions.put("iconClass", ICON);
 		properties.put("_storage_options", storageOptions);
 		obj.put("properties", properties);
 		
