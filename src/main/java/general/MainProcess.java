@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -91,6 +92,8 @@ public class MainProcess {
 		log.info("Selecting "+subsetSize+" original clusters ... ");
 		Set<Long> ccIds = dictVertex.getAllCcIds();
 		ccIds = selectSubsetOfCcIds(ccIds, subsetSize, givenCcIds); 
+		
+		System.out.println(ccIds);
 		
 		// 2.2 get the vertex IDs of these cluster IDs
 		// 	   and determine the new clusters of these vertices
@@ -193,11 +196,11 @@ public class MainProcess {
 			if (size < 0)
 				return ccIds;
 			
-			int i = 1;
-			for (Long ccId : ccIds) {
-				subset.add(ccId);
-				if (++i > size)
-					break;
+			List<Long> listCcId = new ArrayList<Long>(ccIds);
+			Random randomGenerator = new Random();
+			while (subset.size() < size) {				
+				int randomIndex = randomGenerator.nextInt(listCcId.size());
+				subset.add(listCcId.get(randomIndex));
 			}
 		} else {
 			for (int i=0; i < givenCcIds.length; i++) {
