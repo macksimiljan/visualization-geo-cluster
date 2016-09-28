@@ -53,10 +53,18 @@ public class VertexDict {
 		return dict.get(id);
 	}
 	
+	/**
+	 * Returns the IDs of these vertices which are part of the original cluster specified by its ccID.
+	 * @param ccId Original cluster ID.
+	 * @return IDs of vertices within the same original cluster.
+	 */
 	public Set<Long> getVertexIdsByCcId(Long ccId) {
 		return dictCcId.get(ccId);
 	}
 	
+	/**
+	 * @return all ccIDs
+	 */
 	public Set<Long> getAllCcIds() {
 		return dictCcId.keySet();
 	}

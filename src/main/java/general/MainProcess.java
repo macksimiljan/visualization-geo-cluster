@@ -180,6 +180,7 @@ public class MainProcess {
 	 * Selects a subset of original clusters given by its ccID.
 	 * @param ccIds IDs if the original link clusters.
 	 * @param size Subset size.
+	 * @param givenCcIds Alternatively to 'size' ccIDs can be explicitly specified.
 	 * @return Subset of ccIds.
 	 */
 	private static Set<Long> selectSubsetOfCcIds(Set<Long> ccIds, int size, String[] givenCcIds) {	

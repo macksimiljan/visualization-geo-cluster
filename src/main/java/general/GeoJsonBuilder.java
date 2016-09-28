@@ -88,9 +88,6 @@ public class GeoJsonBuilder {
 		// add lines
 		cluster.add(buildMultiLineStringAsFeature(buildCoordinatesForCluster(c, set), COLORS[currColorIndex], LINE_WEIGHT_SMALL));
 		
-		// add cluster marker
-//		cluster.add(buildClusterMarkerAsFeature(c, COLORS[currColorIndex]));
-		
 		return cluster;
 	}
 	
@@ -101,6 +98,7 @@ public class GeoJsonBuilder {
 	 * @param dict Vertex dictionary.
 	 * @param edges Original links.
 	 * @return Original links as GeoJSON object.
+	 * @throws IllegalArgumentException If some vertex has illegal coordinates.
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject buildOldStructure(VertexDict dict, Set<InputEdge> edges) throws IllegalArgumentException {
@@ -137,6 +135,13 @@ public class GeoJsonBuilder {
 		return buildMultiLineStringAsFeature(coordinates, COLOR_ORIGINAL, LINE_WEIGHT_BIG);
 	}
 	
+	/**
+	 * Builds the original link structure with similarity values on the edges.
+	 * @param dict Vertex dictionary.
+	 * @param edges Set of input edges for the original structure.
+	 * @return The original links.
+	 * @throws IllegalArgumentException If some vertex has illegal coordinates.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONArray buildOldStructureWithSimVal(VertexDict dict, Set<InputEdge> edges) throws IllegalArgumentException {
 		JSONArray a = new JSONArray();
@@ -237,63 +242,6 @@ public class GeoJsonBuilder {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
-	private JSONObject buildClusterMarkerAsFeature(ClusterRepresentative c, String color) {
-		JSONObject obj = new JSONObject();
-		obj.put("type", "Feature");
-		
-		JSONObject geometry = new JSONObject();
-		geometry.put("type", "Polygon");
-		geometry.put("coordinates", buildCoordinatesForMarker(c));
-		obj.put("geometry", geometry);
-		
-		JSONObject properties = new JSONObject();
-		properties.put("name", c.label);
-		JSONObject storageOptions = new JSONObject();
-		storageOptions.put("color", color);
-		properties.put("_storage_options", storageOptions);
-		obj.put("properties", properties);
-		
-		return obj;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private JSONArray buildCoordinatesForMarker(ClusterRepresentative c) throws IllegalArgumentException {
-		JSONArray outer = new JSONArray();		
-		
-		if (c.lon != null && c.lat != null) {
-			JSONArray a = new JSONArray();
-			
-			JSONArray point1 = new JSONArray();
-			point1.add(this.round(c.lon + 0.01));
-			point1.add(this.round(c.lat));		
-			JSONArray point2 = new JSONArray();
-			point2.add(this.round(c.lon));
-			point2.add(this.round(c.lat + 0.01));
-			JSONArray point3 = new JSONArray();
-			point3.add(this.round(c.lon - 0.01));
-			point3.add(this.round(c.lat));
-			JSONArray point4 = new JSONArray();
-			point4.add(this.round(c.lon));
-			point4.add(this.round(c.lat - 0.01));
-			
-			a.add(point1);
-			a.add(point2);
-			a.add(point3);
-			a.add(point4);
-			outer.add(a);
-		} else {
-			log.error("Cannot calculate marker for cluster representative without coordinates!");
-		}
-		
-		return outer;
-	}
-	
-	private Double round(Double d) {
-		return Math.round(d*100000)/100000.0;
-	}
-	
-	
 	/**
 	 * Builds a feature collection from a list of features.
 	 * @param features Features as JSON objects.
@@ -378,6 +326,13 @@ public class GeoJsonBuilder {
 		return obj;
 	}
 	
+	/**
+	 * @param coordinates Coordinates of the LineString.
+	 * @param description Description for the line.
+	 * @param color Color of the line.
+	 * @param lineWeight Weight of the line.
+	 * @return LineString.
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject buildLineStringAsFeature(JSONArray coordinates, String description, String color, String lineWeight) {
 		JSONObject obj = new JSONObject();

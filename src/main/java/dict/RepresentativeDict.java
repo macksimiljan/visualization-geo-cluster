@@ -14,6 +14,12 @@ import org.apache.log4j.Logger;
 import parser.MergedClusterParser;
 import representation.ClusterRepresentative;
 
+/**
+ * Dictionary for representatives. 
+ * 
+ * @author MM
+ *
+ */
 public class RepresentativeDict {
 	
 	/** Log4j Logger */
@@ -26,6 +32,11 @@ public class RepresentativeDict {
 	/** Another dictionary: cluster vertex id to its representative. */
 	private Map<Long, ClusterRepresentative> dictV;
 	
+	/**
+	 * Constructor.
+	 * @param mergedClusterFileLoc The merged cluster file.
+	 * @throws IOException If loading the dictionary fails.
+	 */
 	public RepresentativeDict(String mergedClusterFileLoc) throws IOException {
 		this.file = new File(mergedClusterFileLoc);
 		if (!this.file.exists())
@@ -63,6 +74,11 @@ public class RepresentativeDict {
 		return dict.keySet();
 	}
 	
+	/**
+	 * Loads the dictionaries.
+	 * @throws FileNotFoundException If merged cluster file not found.
+	 * @throws IOException If reading the file fails.
+	 */
 	private void loadDict() throws FileNotFoundException, IOException {
 		try(BufferedReader reader = new BufferedReader(new FileReader(file));) {
 			MergedClusterParser parser = new MergedClusterParser();
