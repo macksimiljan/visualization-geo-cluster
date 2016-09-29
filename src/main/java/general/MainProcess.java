@@ -64,7 +64,7 @@ public class MainProcess {
 		/** parameter: subset size of original clusters. */
 		int subsetSize = Integer.parseInt(properties.getProperty("subsetSize"));
 		/** parameter: subset of ccIds. */
-		String[] givenCcIds = properties.getProperty("ccIds").split("\\s*,\\s*");
+		String givenCcIds = properties.getProperty("ccIds");
 		/** parameter: true iff only clusters with less than 4 nodes are printed. */
 		boolean onlyInterestingClusters = Boolean.parseBoolean(properties.getProperty("onlyInterestingClusters"));
 		
@@ -89,7 +89,8 @@ public class MainProcess {
 		}
 			
 		// 2.1 get a particular number of original cluster IDs
-		log.info("Selecting "+subsetSize+" original clusters ... ");
+		log.info((givenCcIds.equals("null")) ? 
+				"Selecting "+subsetSize+" original clusters ... " : "Selecting original clusters according to specification ... ");
 		Set<Long> ccIds = dictVertex.getAllCcIds();
 		ccIds = selectSubsetOfCcIds(ccIds, subsetSize, givenCcIds); 
 		
@@ -97,7 +98,11 @@ public class MainProcess {
 		// 	   and determine the new clusters of these vertices
 		Set<Long> vertexIds = new HashSet<Long>();
 		for (Long ccId : ccIds) {
-			vertexIds.addAll(dictVertex.getVertexIdsByCcId(ccId));				
+			try {
+				vertexIds.addAll(dictVertex.getVertexIdsByCcId(ccId));
+			} catch (NullPointerException e) {
+				log.error("No ccID "+ccId+" exists!");
+			}
 		}
 		Set<ClusterRepresentative> representatives = new HashSet<ClusterRepresentative>();
 		for (Long vertexId : vertexIds) {
@@ -184,10 +189,11 @@ public class MainProcess {
 	 * @param givenCcIds Alternatively to 'size' ccIDs can be explicitly specified.
 	 * @return Subset of ccIds.
 	 */
-	private static Set<Long> selectSubsetOfCcIds(Set<Long> ccIds, int size, String[] givenCcIds) {	
+	private static Set<Long> selectSubsetOfCcIds(Set<Long> ccIds, int size, String givenCcIds) {
 		Set<Long> subset = new HashSet<Long>();
+		String[] array = givenCcIds.split("\\s*,\\s*");
 		
-		if (givenCcIds.length == 1 && givenCcIds[0].equals("null")) {		
+		if (array.length == 1 && array[0].equals("null")) {		
 			if (size == 0)
 				return subset;
 			
@@ -201,8 +207,8 @@ public class MainProcess {
 				subset.add(listCcId.get(randomIndex));
 			}
 		} else {
-			for (int i=0; i < givenCcIds.length; i++) {
-				Long ccId = Long.parseLong(givenCcIds[i]);
+			for (int i=0; i < array.length; i++) {
+				Long ccId = Long.parseLong(array[i].trim());
 				subset.add(ccId);
 			}
 		}

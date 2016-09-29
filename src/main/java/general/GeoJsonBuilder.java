@@ -24,7 +24,9 @@ public class GeoJsonBuilder {
 	public static Logger log = Logger.getLogger(GeoJsonBuilder.class);
 	
 	/** Colors of the clusters. */
-	final private static String[] COLORS = {"SeaGreen", "Chocolate", "LightSeaGreen", "MediumBlue", "FireBrick", "DodgerBlue", "Orchid"};
+	final private static String[] COLORS = {"SeaGreen", "Chocolate", "LightSeaGreen", 
+			"MediumBlue", "FireBrick", "DodgerBlue", "Orchid", 
+			"Tomato", "Teal", "MediumPurple", "PowderBlue"};
 	/** Current color index. */
 	private static int currColorIndex = 0;
 	/** Icon of geo-points within uMap. */
