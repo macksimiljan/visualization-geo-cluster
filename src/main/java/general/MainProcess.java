@@ -93,8 +93,6 @@ public class MainProcess {
 		Set<Long> ccIds = dictVertex.getAllCcIds();
 		ccIds = selectSubsetOfCcIds(ccIds, subsetSize, givenCcIds); 
 		
-		System.out.println(ccIds);
-		
 		// 2.2 get the vertex IDs of these cluster IDs
 		// 	   and determine the new clusters of these vertices
 		Set<Long> vertexIds = new HashSet<Long>();

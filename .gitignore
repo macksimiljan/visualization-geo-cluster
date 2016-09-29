@@ -9,5 +9,6 @@ log/
 target/
 
 # Resources
-src/main/resources/
+src/main/resources/input/
+src/main/resources/layers/
 

@@ -169,7 +169,7 @@ public class GeoJsonBuilder {
 				coordinates.add(point1);
 			}
 			else 
-				log.error("One edge point has no coordinates: start "+start+", end "+target);
+				log.debug("One edge point has no coordinates: start "+start+", end "+target);
 			
 			a.add(buildLineStringAsFeature(coordinates, "aggSimValue: "+edge.aggsimValue, COLOR_ORIGINAL, LINE_WEIGHT_BIG));
 		}
@@ -230,7 +230,7 @@ public class GeoJsonBuilder {
 		obj.put("geometry", geometry);
 		
 		JSONObject properties = new JSONObject();
-		properties.put("name", c.label);
+		properties.put("name", "R: "+c.label);
 		properties.put("description", "**Cluster Representative**\nID: "+c.id+"\nType: "+c.typeIntern+"\nVertices: "+c.clusteredVertexIds);		
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
@@ -320,7 +320,7 @@ public class GeoJsonBuilder {
 		storageOptions.put("weight", lineWeight);
 		storageOptions.put("opacity", LINE_OPACITY);
 		properties.put("_storage_options", storageOptions);
-		properties.put("name", (color.equals(COLOR_ORIGINAL)) ? "original link" : "new cluster link");
+//		properties.put("name", (color.equals(COLOR_ORIGINAL)) ? "original link" : "new cluster link");
 		obj.put("properties", properties);
 		
 		return obj;
