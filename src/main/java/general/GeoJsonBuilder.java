@@ -23,23 +23,21 @@ public class GeoJsonBuilder {
 	/** Log4j Logger */
 	public static Logger log = Logger.getLogger(GeoJsonBuilder.class);
 	
-	/** Colors of the clusters. */
-	final private static String[] COLORS = {"SeaGreen", "Chocolate", "LightSeaGreen", 
-			"MediumBlue", "FireBrick", "DodgerBlue", "Orchid", 
-			"Tomato", "Teal", "MediumPurple", "PowderBlue"};
 	/** Current color index. */
 	private static int currColorIndex = 0;
-	/** Icon of geo-points within uMap. */
-	final private static String ICON = "Drop";
-	/** Big edge weight. */
-	final private static String LINE_WEIGHT_BIG = "10";
-	/** Small edge weight. */
-	final private static String LINE_WEIGHT_SMALL = "4";
-	/** Edge opacity. */
-	final private static String LINE_OPACITY = "0.8";
-	/** Original link color. */
-	final private static String COLOR_ORIGINAL = "Gray";
 	
+	/** Color of a vertex (except representative) is determined by its type. */
+	private final boolean colorByVertexType;
+	/** Color of a vertex is determined by the type of its representative. */
+	private final boolean colorByRepresType;
+	/** No cluster representative is printed to the geojson output. */
+	private final boolean noRepresentative;
+	
+	public GeoJsonBuilder(boolean colorByVertexType, boolean colorByRepresType, boolean noRepresentative) {
+		this.colorByVertexType = colorByVertexType;
+		this.colorByRepresType = colorByRepresType;
+		this.noRepresentative = noRepresentative;
+	}
 	
 	/**
 	 * Builds a GeoJSON array as the representation of a cluster.
@@ -51,14 +49,12 @@ public class GeoJsonBuilder {
 	@SuppressWarnings("unchecked")
 	public JSONArray buildCluster(ClusterRepresentative c, Set<Vertex> set) throws IllegalArgumentException {
 		JSONArray cluster = new JSONArray();
-		currColorIndex = ++currColorIndex % COLORS.length;
+		currColorIndex = ++currColorIndex % ViewConstants.COLORS.length;
 		
-		// add points
-		if (c.lat != null && c.lon != null) {
-			cluster.add(buildPointAsFeature(c, COLORS[currColorIndex]));
-		} else {
+		// check for illegal values
+		if (c.lat == null || c.lon == null) {
 			// cluster representative has no coordinates
-			for (Vertex v : set) {
+			for (Vertex v : set) { // randomly selecting coordinates from one other vertex
 				if (v.lat == null || v.lon == null) {
 					continue;
 				} else {
@@ -70,10 +66,17 @@ public class GeoJsonBuilder {
 			}
 			// no vertex within the cluster has coordinates
 			if (c.lat == null && c.lon == null)
-				throw new IllegalArgumentException("No coordinates for the cluster representative: "+c);
-		}
+				throw new IllegalArgumentException("No coordinates for the cluster representative: "+c);			
+		}		
 		if (c.lat != null && c.lon != null && (c.lat > 180 || c.lat < -180 || c.lon > 180 || c.lon < -180))
 			throw new IllegalArgumentException("Illegal coordinates: "+c);
+		
+		String colorRepr = ViewConstants.COLORS[currColorIndex];
+		if (colorByRepresType)
+			colorRepr = ViewConstants.getTypeColor(c.typeIntern);
+		// 1: add cluster representative to cluster
+		if (!noRepresentative && c.lat != null && c.lon != null)
+			cluster.add(buildPointAsFeature(c, colorRepr));
 		
 		for (Vertex v : set) {
 			if (v.lat == null || v.lon == null)
@@ -84,11 +87,18 @@ public class GeoJsonBuilder {
 			if (v.lat != null && v.lon != null && (v.lat > 180 || v.lat < -180 || v.lon > 180 || v.lon < -180))
 				throw new IllegalArgumentException("Illegal coordinates: "+v);
 			
-			cluster.add(buildPointAsFeature(v, COLORS[currColorIndex]));
+			String colorVertex = ViewConstants.COLORS[currColorIndex];
+			if (colorByVertexType)
+				colorVertex = ViewConstants.getTypeColor(v.typeInternInput);
+			else if (colorByRepresType)
+				colorVertex = colorRepr;
+			// 2: add vertices to cluster
+			cluster.add(buildPointAsFeature(v, colorVertex));
 		}
 		
-		// add lines
-		cluster.add(buildMultiLineStringAsFeature(buildCoordinatesForCluster(c, set), COLORS[currColorIndex], LINE_WEIGHT_SMALL));
+		// 3: add lines
+		cluster.add(buildMultiLineStringAsFeature(
+				buildCoordinatesForCluster(c, set), colorRepr,ViewConstants.LINE_WEIGHT_SMALL));
 		
 		return cluster;
 	}
@@ -134,7 +144,7 @@ public class GeoJsonBuilder {
 				log.debug("One edge point has no coordinates: start "+start+", end "+target);
 		}
 		
-		return buildMultiLineStringAsFeature(coordinates, COLOR_ORIGINAL, LINE_WEIGHT_BIG);
+		return buildMultiLineStringAsFeature(coordinates, ViewConstants.COLOR_ORIGINAL, ViewConstants.LINE_WEIGHT_BIG);
 	}
 	
 	/**
@@ -173,7 +183,7 @@ public class GeoJsonBuilder {
 			else 
 				log.debug("One edge point has no coordinates: start "+start+", end "+target);
 			
-			a.add(buildLineStringAsFeature(coordinates, "aggSimValue: "+edge.aggsimValue, COLOR_ORIGINAL, LINE_WEIGHT_BIG));
+			a.add(buildLineStringAsFeature(coordinates, "aggSimValue: "+edge.aggsimValue, ViewConstants.COLOR_ORIGINAL, ViewConstants.LINE_WEIGHT_BIG));
 		}
 		
 		return a;
@@ -205,7 +215,7 @@ public class GeoJsonBuilder {
 		properties.put("description", description);
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
-		storageOptions.put("iconClass", ICON);
+		storageOptions.put("iconClass", ViewConstants.ICON);
 		properties.put("_storage_options", storageOptions);
 		obj.put("properties", properties);
 		
@@ -320,7 +330,7 @@ public class GeoJsonBuilder {
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
 		storageOptions.put("weight", lineWeight);
-		storageOptions.put("opacity", LINE_OPACITY);
+		storageOptions.put("opacity", ViewConstants.LINE_OPACITY);
 		properties.put("_storage_options", storageOptions);
 //		properties.put("name", (color.equals(COLOR_ORIGINAL)) ? "original link" : "new cluster link");
 		obj.put("properties", properties);
@@ -354,9 +364,9 @@ public class GeoJsonBuilder {
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
 		storageOptions.put("weight", lineWeight);
-		storageOptions.put("opacity", LINE_OPACITY);
+		storageOptions.put("opacity", ViewConstants.LINE_OPACITY);
 		properties.put("_storage_options", storageOptions);
-		properties.put("name", (color.equals(COLOR_ORIGINAL)) ? "original link" : "new cluster link");
+		properties.put("name", (color.equals(ViewConstants.COLOR_ORIGINAL)) ? "original link" : "new cluster link");
 		properties.put("description", description);
 		obj.put("properties", properties);
 		

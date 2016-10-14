@@ -66,11 +66,17 @@ public class MainProcess {
 		/** parameter: subset of ccIds. */
 		String givenCcIds = properties.getProperty("ccIds");
 		/** parameter: true iff only clusters with less than 4 nodes are printed. */
-		boolean onlyInterestingClusters = Boolean.parseBoolean(properties.getProperty("onlyInterestingClusters"));
+		boolean onlyInterestingClusters = Boolean.parseBoolean(properties.getProperty("onlyInterestingClusters").trim());
+		/** parameter: true iff color of a vertex (except representative) is determined by its type */
+		boolean colorByVertexType = Boolean.parseBoolean(properties.getProperty("colorByVertexType").trim());
+		/** parameter: true iff no cluster representative is printed to the geojson output */
+		boolean noRepresentative = Boolean.parseBoolean(properties.getProperty("noRepresentative").trim());
+		/** parameter: true iff color of a vertex is determined by the type of its representative */
+		boolean colorByRepresType = Boolean.parseBoolean(properties.getProperty("colorByRepresType").trim());
 		
 		
 		log.info("--- start ---");
-					
+							
 		// 1. create dictionaries
 		VertexDict dictVertex = null;
 		EdgeDict dictEdge = null;
@@ -113,7 +119,7 @@ public class MainProcess {
 			
 		// 3.1 construct GeoJSON objects of the original links
 		log.info("Constructing original links ... ");
-		GeoJsonBuilder geo = new GeoJsonBuilder();
+		GeoJsonBuilder geo = new GeoJsonBuilder(colorByVertexType, colorByRepresType, noRepresentative);
 		List<JSONObject> features = new ArrayList<JSONObject>();
 		Set<InputEdge> edges = dictEdge.getEdgesByVertexIds(vertexIds);
 		try {
