@@ -7,15 +7,36 @@ import java.util.Set;
 public abstract class ViewConstants {
 	
 	/** Colors of the clusters. */
-//	final private static String[] COLORS = {"SeaGreen", "Chocolate", "LightSeaGreen", 
-//			"MediumBlue", "FireBrick", "DodgerBlue", "Orchid", 
-//			"Tomato", "Teal", "MediumPurple", "PowderBlue"};
-	final public static String[] COLORS = { "Navy", "Blue", "Green", "DarkCyan", "DeepSkyBlue", 
+	final public static String[] COLORS = {"SeaGreen", "Chocolate", "LightSeaGreen", 
+			"MediumBlue", "FireBrick", "DodgerBlue", "Orchid", 
+			"Tomato", "Teal", "MediumPurple", "PowderBlue"};
+	
+	final public static String[] COLORS_BLUE = { "Navy", "Blue", "Green", "DarkCyan", "DeepSkyBlue", 
 			"SteelBlue", "RoyalBlue", "MediumSeaGreen", "SeaGreen", "LightSeaGreen",
 			"CornflowerBlue", "CadetBlue" };
 	
+	final public static String[] COLORS_RED = {
+			"Sienna", "FireBrick", "IndianRed", "Chocolate","Crimson",
+			"Red", "LightCoral", "OrangeRed", "LightSalmon", "Pink",
+			"Salmon", "Peru"
+	};
+	
+	final public static String[] COLORS_PINK = {
+			"DarkSlateBlue", "Indigo", "Purple", "BlueViolet", "MediumPurple", "DarkOrchid",
+			"MediumOrchid", "Orchid", "Plum", "Violet", "Fuchsia",
+			"HotPink", "LightPink"
+	};
+	
+	final public static String[] COLORS_GREY = {
+		"DimGrey", "SlateGrey", "LightSlateGrey", "Grey", "DarkGrey",
+		"LightBlue", "LightSteelBlue", "Silver", "LightGrey", "Thistle",
+		"LightCyan", "Linen"
+	};
+	
 	/** Icon of geo-points within uMap. */
-	final public static String ICON = "Circle"; //"Drop";
+	final public static String ICON = /*"Circle"; //*/"Drop";
+	/** Icon of geo-points within uMap. */
+	final public static String ICON_REPR = /*"Circle"; //*/"Default";
 	/** Big edge weight. */
 	final public static String LINE_WEIGHT_BIG = "10";
 	/** Small edge weight. */

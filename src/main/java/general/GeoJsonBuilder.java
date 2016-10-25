@@ -32,11 +32,18 @@ public class GeoJsonBuilder {
 	private final boolean colorByRepresType;
 	/** No cluster representative is printed to the geojson output. */
 	private final boolean noRepresentative;
+	/** Only cluster representatives are printed to the geojson output. */
+	private final boolean onlyRepresentative;
 	
-	public GeoJsonBuilder(boolean colorByVertexType, boolean colorByRepresType, boolean noRepresentative) {
+	public GeoJsonBuilder(boolean colorByVertexType, boolean colorByRepresType, boolean noRepresentative, boolean onlyRepresentative) {
 		this.colorByVertexType = colorByVertexType;
 		this.colorByRepresType = colorByRepresType;
+		if (noRepresentative && onlyRepresentative) {
+			noRepresentative = false;
+			onlyRepresentative = false;
+		}
 		this.noRepresentative = noRepresentative;
+		this.onlyRepresentative = onlyRepresentative;
 	}
 	
 	/**
@@ -93,11 +100,13 @@ public class GeoJsonBuilder {
 			else if (colorByRepresType)
 				colorVertex = colorRepr;
 			// 2: add vertices to cluster
-			cluster.add(buildPointAsFeature(v, colorVertex));
+			if (!onlyRepresentative)
+				cluster.add(buildPointAsFeature(v, colorVertex));
 		}
 		
 		// 3: add lines
-		cluster.add(buildMultiLineStringAsFeature(
+		if (!onlyRepresentative)
+			cluster.add(buildMultiLineStringAsFeature(
 				buildCoordinatesForCluster(c, set), colorRepr,ViewConstants.LINE_WEIGHT_SMALL));
 		
 		return cluster;
@@ -246,7 +255,7 @@ public class GeoJsonBuilder {
 		properties.put("description", "**Cluster Representative**\nID: "+c.id+"\nType: "+c.typeIntern+"\nVertices: "+c.clusteredVertexIds);		
 		JSONObject storageOptions = new JSONObject();
 		storageOptions.put("color", color);
-//		storageOptions.put("iconClass", ICON);
+		storageOptions.put("iconClass", ViewConstants.ICON_REPR);
 		properties.put("_storage_options", storageOptions);
 		obj.put("properties", properties);
 		

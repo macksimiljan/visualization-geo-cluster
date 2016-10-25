@@ -67,13 +67,16 @@ public class MainProcess {
 		String givenCcIds = properties.getProperty("ccIds");
 		/** parameter: true iff only clusters with less than 4 nodes are printed. */
 		boolean onlyInterestingClusters = Boolean.parseBoolean(properties.getProperty("onlyInterestingClusters").trim());
+		/** parameter: subset size of original clusters. */
+		int interestingSize = Integer.parseInt(properties.getProperty("interestingSize"));
 		/** parameter: true iff color of a vertex (except representative) is determined by its type */
 		boolean colorByVertexType = Boolean.parseBoolean(properties.getProperty("colorByVertexType").trim());
 		/** parameter: true iff no cluster representative is printed to the geojson output */
 		boolean noRepresentative = Boolean.parseBoolean(properties.getProperty("noRepresentative").trim());
 		/** parameter: true iff color of a vertex is determined by the type of its representative */
 		boolean colorByRepresType = Boolean.parseBoolean(properties.getProperty("colorByRepresType").trim());
-		
+		/** parameter: true iff only cluster representatives are printed to the geojson output */
+		boolean onlyRepresentative = Boolean.parseBoolean(properties.getProperty("onlyRepresentative").trim());
 		
 		log.info("--- start ---");
 							
@@ -90,6 +93,7 @@ public class MainProcess {
 			dictRepresentative = new RepresentativeDict(clusterFileLoc);
 		} catch (Exception e) {
 			log.error("Error while loading the dictionaries.");
+			e.printStackTrace();
 			log.debug(e.getMessage());
 			System.exit(1);
 		}
@@ -119,7 +123,7 @@ public class MainProcess {
 			
 		// 3.1 construct GeoJSON objects of the original links
 		log.info("Constructing original links ... ");
-		GeoJsonBuilder geo = new GeoJsonBuilder(colorByVertexType, colorByRepresType, noRepresentative);
+		GeoJsonBuilder geo = new GeoJsonBuilder(colorByVertexType, colorByRepresType, noRepresentative, onlyRepresentative);
 		List<JSONObject> features = new ArrayList<JSONObject>();
 		Set<InputEdge> edges = dictEdge.getEdgesByVertexIds(vertexIds);
 		try {
@@ -156,11 +160,16 @@ public class MainProcess {
 			}
 			
 			try {
-				// check whether cluster is interesting
-				if (onlyInterestingClusters) {
+				if (onlyInterestingClusters && interestingSize < 0) {
+					// check whether cluster is interesting; default case
 					if (otherNodes.size() < 4)
 						features.addAll(geo.buildCluster(clusterRepr, otherNodes));
+				} else if (onlyInterestingClusters && interestingSize >= 0) {
+					// check whether a cluster has an interesting size
+					if (otherNodes.size() == interestingSize)
+						features.addAll(geo.buildCluster(clusterRepr, otherNodes));
 				} else {
+					// we are interested in all clusters!
 					features.addAll(geo.buildCluster(clusterRepr, otherNodes));
 				}
 			} catch (Exception e) {
@@ -199,7 +208,7 @@ public class MainProcess {
 		Set<Long> subset = new HashSet<Long>();
 		String[] array = givenCcIds.split("\\s*,\\s*");
 		
-		if (array.length == 1 && array[0].equals("null")) {		
+		if (array.length == 1 && array[0].trim().equals("null")) {		
 			if (size == 0)
 				return subset;
 			

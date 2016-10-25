@@ -50,7 +50,7 @@ public class Vertex {
 
 	@Override
 	public String toString() {
-		return "Vertex [id=" + id + ", lon=" + lon + ", lat=" + lat + ", label=" + label + ", processingNote: " + processingNote + "]";
+		return "Vertex [id=" + id + ", ccId="+ccId+", lon=" + lon + ", lat=" + lat + ", label=" + label + ", processingNote: " + processingNote + "]";
 	}
 
 

@@ -64,6 +64,7 @@ public class TypeAnalyser {
 		this.multiType = 0;
 	}
 	
+	// ##### main ######
 	public static void main(String[] args) {
 		TypeAnalyser ta = new TypeAnalyser();
 		String fileV = "./src/main/resources/input/vertexInput.geojson";
