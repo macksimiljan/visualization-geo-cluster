@@ -6,16 +6,26 @@ package representation;
  * @author MM
  */
 public  class Region {
+	
+	public String label;
+	
 	final double top;
 	final double bottom;
 	final double left;
 	final double right;
+	
+	public Region(double top, double bottom, double left, double right, String label) {
+		this(top, bottom, left, right);
+		this.label = label;
+	}
 	
 	public Region(double top, double bottom, double left, double right) {
 		this.top = top;
 		this.bottom = bottom;
 		this.left = left;
 		this.right = right;
+		
+		label = null;
 		
 		if (top > 90 || top < -90 || bottom > 90 || bottom < -90 ||
 				left > 180 || left < -180 || right > 180 || right < -180)
@@ -29,7 +39,17 @@ public  class Region {
 	 * @return 'true' iff location is within this region.
 	 */
 	public boolean contains(double longitude, double latitude) {
-		return ( (longitude <= right) && (longitude >= left) ) && (latitude <= top && latitude >= bottom);
+		boolean isContained = latitude <= top && latitude >= bottom;
+		
+		if (Math.signum(right) + Math.signum(left) == 0) {
+			// region longitude dimension is not continuous
+			//TODO
+			isContained = false;
+		} else {
+			isContained &= longitude >= left && longitude <= right;
+		}
+		
+		return isContained;
 	}
 	
 	@Override
