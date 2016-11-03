@@ -41,10 +41,10 @@ public  class Region {
 	public boolean contains(double longitude, double latitude) {
 		boolean isContained = latitude <= top && latitude >= bottom;
 		
-		if (Math.signum(right) + Math.signum(left) == 0) {
+		if (Math.signum(right) < Math.signum(left)) {
 			// region longitude dimension is not continuous
-			//TODO
-			isContained = false;
+			// ... 160 ... 170 ... | ... -170 ... -160 ... or: -20 ... -10 ... | ... 10 ... 20
+			isContained &= ( longitude >= left && longitude >= 0 || longitude <= right && longitude <= 0 );
 		} else {
 			isContained &= longitude >= left && longitude <= right;
 		}

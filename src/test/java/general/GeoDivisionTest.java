@@ -44,7 +44,7 @@ public class GeoDivisionTest {
 		dakar.lat = 14.6; dakar.lon = -17.6; dakar.label = "dakar";
 		set.add(dakar);
 		Vertex arabicSea = new Vertex();
-		arabicSea.lat = 15.0; arabicSea.lon = 15.0; arabicSea.label = "arabicSea";
+		arabicSea.lat = 15.0; arabicSea.lon = 65.0; arabicSea.label = "arabicSea";
 		set.add(arabicSea);
 		Vertex kabul = new Vertex();
 		kabul.lat = 34.5; kabul.lon = 69.2; kabul.label = "kabul";
