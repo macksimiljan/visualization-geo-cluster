@@ -30,7 +30,7 @@ public class GeoDivisionTest {
 		set.add(paris);
 		Vertex athens = new Vertex();
 		athens.lat = 38.1; athens.lon = 23.9; athens.label = "athens";
-		System.out.println(set.add(athens));
+		set.add(athens);
 		Vertex dublin = new Vertex();
 		dublin.lat = 53.3; dublin.lon = -6.4; dublin.label = "dublin";
 		set.add(dublin);
@@ -44,7 +44,7 @@ public class GeoDivisionTest {
 		dakar.lat = 14.6; dakar.lon = -17.6; dakar.label = "dakar";
 		set.add(dakar);
 		Vertex arabicSea = new Vertex();
-		arabicSea.lat = 15.0; arabicSea.lon = 65.0; arabicSea.label = "arabicSea";
+		arabicSea.lat = 10.0; arabicSea.lon = 65.0; arabicSea.label = "arabicSea";
 		set.add(arabicSea);
 		Vertex kabul = new Vertex();
 		kabul.lat = 34.5; kabul.lon = 69.2; kabul.label = "kabul";
@@ -61,9 +61,6 @@ public class GeoDivisionTest {
 		Vertex panama = new Vertex();
 		panama.lat = 8.6; panama.lon = -80.4; panama.label = "panama";
 		set.add(panama);
-		
-		System.out.println(set.size());
-		System.out.println("------");
 		
 		div.addVertices(set);
 		for (Region r : div.getRegions()) {

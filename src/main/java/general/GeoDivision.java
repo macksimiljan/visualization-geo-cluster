@@ -21,6 +21,8 @@ public class GeoDivision {
 	/** Mapping from region to vertices. */
 	private Map<Region, Set<Vertex>> verticesPerRegion;
 	
+	private final Region regionWithoutCoordinates = new Region(90, -90, 180, -180, "noCoordinates");
+	
 	/**
 	 * @return Six default regions which overlapping cover the world.
 	 */
@@ -42,8 +44,8 @@ public class GeoDivision {
 		 */
 		List<Region> regions = new ArrayList<Region>();
 		
-		Region europe = new Region(90, (15-5), (-30-5), (65+5), "europe");
-		Region africa = new Region((15+5), -90, (-30-5), (65+5), "africa");
+		Region europe = new Region(90, (20-5), (-30-5), (65+5), "europe");
+		Region africa = new Region((20+5), -90, (-30-5), (65+5), "africa");
 		
 		Region asia = new Region(90, (5-5), (65-5), (-170+5), "asia");
 		Region australia = new Region((5+5), -90, (65-5), (-170+5), "australia");
@@ -90,20 +92,38 @@ public class GeoDivision {
 	}
 	
 	/**
+	 * Determines the regions (they are overlapping) in which a given vertex is.
+	 * @param v Vertex.
+	 * @return The corresponding regions to the vertex.
+	 */
+	public Set<Region> determineRegion(Vertex v) {
+		Set<Region> regions = new HashSet<Region>();		
+		for (Region region : verticesPerRegion.keySet()) {
+			if (v.lon == null || v.lat == null)
+				regions.add(regionWithoutCoordinates);
+			else if (region.contains(v.lon, v.lat)) 
+				regions.add(region);
+		}
+		
+		return regions;
+	}
+	
+	/**
 	 * Adds vertices to the regions they belong to.
 	 * @param vertices Set of vertices.
 	 */
 	public void addVertices(Set<Vertex> vertices) {
 		for (Vertex v : vertices) {
-			System.out.println("\t\t>>"+v.label+": "+v.lat+", "+v.lon);
-			for (Region region : verticesPerRegion.keySet()) {
-				System.out.println("\t\t\t>>"+region.label+": "+region);
-				if (region.contains(v.lon, v.lat)) {
-					System.out.println("\t\t\t\t>>contained");
-					Set<Vertex> val = verticesPerRegion.get(region);
-					val.add(v);
-					verticesPerRegion.put(region, val);
-				}
+			addVertex(v);
+		}
+	}
+	
+	public void addVertex(Vertex v) {
+		for (Region region : verticesPerRegion.keySet()) {
+			if (region.contains(v.lon, v.lat)) {
+				Set<Vertex> val = verticesPerRegion.get(region);
+				val.add(v);
+				verticesPerRegion.put(region, val);
 			}
 		}
 	}
