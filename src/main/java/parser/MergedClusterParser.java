@@ -87,7 +87,7 @@ public class MergedClusterParser {
 		for (String type : r.typeIntern)
 			typeIntern.add(type);
 		data.put("typeIntern", typeIntern);
-		data.put("simpleType", null);
+		data.put("simpleType", r.simpleType);
 		data.put("lon", r.lon);
 		data.put("label", r.label);
 		data.put("lat", r.lat);
