@@ -196,15 +196,18 @@ public class MainProcess {
 			}
 		}		
 		
-		// modify files: add region name to the file name
+		// modify files: add region name and cluster size to the file name
 		String prefixOriginal = originalLinksLoc.substring(0, originalLinksLoc.lastIndexOf('.'));
 		String suffixOriginal = originalLinksLoc.substring(originalLinksLoc.lastIndexOf('.'));
 		String prefixClusters = newClustersLoc.substring(0, newClustersLoc.lastIndexOf('.'));
 		String suffixClusters = newClustersLoc.substring(newClustersLoc.lastIndexOf('.'));
 		
 		for (Region region : partitionRepresentatives.keySet()) {
-			filesForOriginalLinks.put(region, prefixOriginal+"_"+region.label+suffixOriginal);
-			filesForNewClusters.put(region, prefixClusters+"_"+region.label+suffixClusters);
+			String infix = "_"+region.label;
+			if (onlyInterestingClusters)
+				infix += (interestingSize < 0) ? "_lt4" : "_"+interestingSize;
+			filesForOriginalLinks.put(region, prefixOriginal+infix+suffixOriginal);
+			filesForNewClusters.put(region, prefixClusters+infix+suffixClusters);
 		}			
 		
 		for (Region region : partitionRepresentatives.keySet()) {
