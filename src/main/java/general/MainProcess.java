@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,11 +17,13 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import dict.EdgeDict;
 import dict.RepresentativeDict;
 import dict.VertexDict;
+import parser.MergedClusterParser;
 import representation.ClusterRepresentative;
 import representation.InputEdge;
 import representation.Region;
@@ -203,11 +206,11 @@ public class MainProcess {
 		String suffixClusters = newClustersLoc.substring(newClustersLoc.lastIndexOf('.'));
 		
 		for (Region region : partitionRepresentatives.keySet()) {
-			String infix = "_"+region.label;
-			if (onlyInterestingClusters)
-				infix += (interestingSize < 0) ? "_lt4" : "_"+interestingSize;
-			filesForOriginalLinks.put(region, prefixOriginal+infix+suffixOriginal);
-			filesForNewClusters.put(region, prefixClusters+infix+suffixClusters);
+			String locNewClusters = (onlyInterestingClusters) ? 
+					prefixClusters+"_"+region.label+"_size"+interestingSize+suffixClusters :
+						prefixClusters+"_"+region.label+suffixClusters;
+			filesForOriginalLinks.put(region, prefixOriginal+"_"+region.label+suffixOriginal);
+			filesForNewClusters.put(region, locNewClusters);
 		}			
 		
 		for (Region region : partitionRepresentatives.keySet()) {
@@ -292,7 +295,10 @@ public class MainProcess {
 		// 1 construct GeoJSON objects for each representative
 		log.info("Iterating through cluster representatives (#: "+representatives.size()+") ... ");	
 		GeoJsonBuilder geo = new GeoJsonBuilder(colorByVertexType, colorByRepresType, noRepresentative, onlyRepresentative);
-		List<JSONObject> features = new ArrayList<JSONObject>();		
+		List<JSONObject> features = new ArrayList<JSONObject>();
+		
+		List<String> evalData = new ArrayList<String>();
+		
 		for (ClusterRepresentative clusterRepr : representatives) {				
 			// build GeoJSON objects of new clusters
 			Set<Vertex> otherNodes = new HashSet<Vertex>();
@@ -300,6 +306,9 @@ public class MainProcess {
 				Vertex v = dictVertex.getVertexById(id);
 				otherNodes.add(v);
 			}
+			
+			String json = MergedClusterParser.printClusterRepresentative(clusterRepr);
+			evalData.add(clusterRepr.label+"_#####_"+json);
 			
 			try {
 				if (onlyInterestingClusters && interestingSize < 0) {
@@ -317,7 +326,18 @@ public class MainProcess {
 			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
-		}		
+		}
+		
+		String prefix = loc.substring(0, loc.lastIndexOf('.'));
+		String suffix = loc.substring(loc.lastIndexOf('.'));
+		Collections.sort(evalData);
+		try (PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(prefix+"_EVAL_"+suffix)))) {
+			for (String line : evalData)
+				w.println(line.substring(line.indexOf("_#####_")+"_#####_".length()));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		// 2 save GeoJSON objects of new clusters
 		try (PrintWriter writerCluster = new PrintWriter(new BufferedWriter(new FileWriter(loc)));) {
@@ -335,5 +355,7 @@ public class MainProcess {
 			log.error(e.getMessage());
 		}
 	}
+	
+
 	
 }

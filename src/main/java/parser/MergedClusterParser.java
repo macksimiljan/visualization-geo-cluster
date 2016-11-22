@@ -33,6 +33,7 @@ public class MergedClusterParser {
 			r.id = (Long) object.get("id");
 			JSONObject data = (JSONObject)object.get("data");
 			r.label = (String)data.get("label");
+			r.simpleType = (String)data.get("simpleType");
 			try {
 				r.lat = (Double)data.get("lat");
 			} catch(Exception e) {
@@ -76,6 +77,31 @@ public class MergedClusterParser {
 		}
 		
 		return r;
+	}
+	
+	public static String printClusterRepresentative(ClusterRepresentative r) {
+		JSONObject obj = new JSONObject();
+		obj.put("id", r.id);
+		JSONObject data = new JSONObject();
+		JSONArray typeIntern = new JSONArray();
+		for (String type : r.typeIntern)
+			typeIntern.add(type);
+		data.put("typeIntern", typeIntern);
+		data.put("simpleType", r.simpleType);
+		data.put("lon", r.lon);
+		data.put("label", r.label);
+		data.put("lat", r.lat);
+		JSONArray ontologies = new JSONArray();
+		for (String ont : r.ontologies)
+			ontologies.add(ont);
+		data.put("ontologies", ontologies);
+		JSONArray clusteredVertices = new JSONArray();
+		for (Long vertex : r.clusteredVertexIds)
+			clusteredVertices.add(vertex);
+		data.put("clusteredVertices", clusteredVertices);
+		obj.put("data", data);
+		
+		return obj.toJSONString();
 	}
 
 }

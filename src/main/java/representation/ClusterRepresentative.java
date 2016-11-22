@@ -13,6 +13,8 @@ public class ClusterRepresentative extends Vertex {
 	
 	/** Types of the cluster, e.g. Settlement. */
 	public Set<String> typeIntern;
+	/** Simple type of the cluster. */
+	public String simpleType;	
 	/** Ontologies which have a vertex within the cluster. */
 	public Set<String> ontologies;
 	/** IDs of the vertices contained the cluster. */
