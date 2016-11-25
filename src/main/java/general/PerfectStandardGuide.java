@@ -47,7 +47,7 @@ public class PerfectStandardGuide {
 				ClusterRepresentative cluster = parser.parseLine(line);
 				System.out.println();
 				System.out.println("###########################################");
-				System.out.println("label:\t\t"+cluster.label+"\nsimple type:\t"+cluster.simpleType);
+				System.out.println("label:\t\t"+cluster.label+"\nsimple type:\t"+cluster.simpleType+"\nnodes:\t\t"+cluster.clusteredVertexIds);
 				System.out.println("-------------------------------");
 				
 				boolean printCluster = true;
