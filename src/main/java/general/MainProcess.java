@@ -146,11 +146,8 @@ public class MainProcess {
 			Set<Long> newVertexIds = new HashSet<Long>();
 			for (Long vertexId : vertexIds) {
 				Vertex vertex = dictVertex.getVertexById(vertexId);
-				System.out.println("vertex: "+vertex);
-				if (checkTypeRestriction(vertex, typeRestriction, dictEdge, dictVertex)) {
+				if (checkTypeRestriction(vertex, typeRestriction, dictEdge, dictVertex))
 					newVertexIds.add(vertexId);
-					System.out.println("\t !!");
-				}
 			}
 			log.info("Type restriction reduced the set of vertices from "+vertexIds.size()+" to "+newVertexIds.size());
 			vertexIds = newVertexIds;
@@ -356,8 +353,14 @@ public class MainProcess {
 				}
 			}
 			
-			String json = MergedClusterParser.printClusterRepresentative(clusterRepr);
-			evalData.add(clusterRepr.label+"_#####_"+json);
+			String nodes = "[", ontologies = "[";
+			for (Vertex v : otherNodes) {
+				nodes += v.id+",";
+				ontologies += "\""+v.ontology+"\",";
+			}
+			nodes = nodes.substring(0, nodes.length()-1)+"]";
+			ontologies = ontologies.substring(0, ontologies.length()-1)+"]";
+			evalData.add(clusterRepr.label+"_#####_"+"{\"data\":{\"label\":\""+clusterRepr.label+"\",\"clusteredVertices\":"+nodes+",\"ontologies\":"+ontologies+",\"simpleType\":\"Settlement\"}}");
 			
 			try {
 				if (onlyInterestingClusters && interestingSize < 0) {
