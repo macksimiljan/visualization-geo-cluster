@@ -122,6 +122,7 @@ public class GeoJsonBuilder {
 	 * @throws IllegalArgumentException If some vertex has illegal coordinates.
 	 */
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	public JSONObject buildOldStructure(VertexDict dict, Set<InputEdge> edges) throws IllegalArgumentException {
 		JSONArray coordinates = new JSONArray();
 		for (InputEdge edge : edges) {
@@ -161,10 +162,9 @@ public class GeoJsonBuilder {
 	 * @param dict Vertex dictionary.
 	 * @param edges Set of input edges for the original structure.
 	 * @return The original links.
-	 * @throws IllegalArgumentException If some vertex has illegal coordinates.
 	 */
 	@SuppressWarnings("unchecked")
-	public JSONArray buildOldStructureWithSimVal(VertexDict dict, Set<InputEdge> edges) throws IllegalArgumentException {
+	public JSONArray buildOldStructureWithSimVal(VertexDict dict, Set<InputEdge> edges) {
 		JSONArray a = new JSONArray();
 		
 		for (InputEdge edge : edges) {
@@ -182,12 +182,13 @@ public class GeoJsonBuilder {
 					&& point1.get(0) != null && point1.get(1) != null) {				
 
 				if (start.lat > 180 || start.lat < -180 || start.lon > 180 || start.lon < -180)
-					throw new IllegalArgumentException("Illegal coordinates: "+start);
-				if (target.lat > 180 || target.lat < -180 || target.lon > 180 || target.lon < -180)
-					throw new IllegalArgumentException("Illegal coordinates: "+target);
-				
-				coordinates.add(point0);
-				coordinates.add(point1);
+					log.error("Illegal coordinates: "+start);
+				else if (target.lat > 180 || target.lat < -180 || target.lon > 180 || target.lon < -180)
+					log.error("Illegal coordinates: "+target);
+				else {
+					coordinates.add(point0);
+					coordinates.add(point1);
+				}			
 			}
 			else 
 				log.debug("One edge point has no coordinates: start "+start+", end "+target);

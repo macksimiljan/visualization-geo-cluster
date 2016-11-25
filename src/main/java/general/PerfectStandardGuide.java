@@ -32,7 +32,7 @@ public class PerfectStandardGuide {
 		System.out.println("\t 7 = no coordinates");		
 		int c = IOTools.readInteger(" >> ");
 		
-		String path = "/home/max/git/visualization-geo-cluster/src/main/resources/layers/";
+		String path = "./src/main/resources/eval/";
 		String[] files = {"eval_africa.json", "eval_asia.json", "eval_australia.json", "eval_europe.json", 
 				"eval_northAm.json", "eval_southAm.json", "eval_noCoordinates.json"};
 		String file = files[c-1];

@@ -47,7 +47,7 @@ public class EdgeDict {
 	}
 	
 	/**
-	 * Returns edges for a given vertex ID as start point.
+	 * Returns edges for a given vertex ID as start and end point, respectively.
 	 * @param id Start point ID.
 	 * @return Set of edges.
 	 * @throws NullPointerException If the dictionary contains no edges for that start ID.
@@ -98,7 +98,7 @@ public class EdgeDict {
 			String line = null;
 			while ( (line = reader.readLine()) != null) {
 				InputEdge edge = parser.parseLine(line);
-				
+				// from source to target
 				Set<InputEdge> val = null;
 				if (dict.containsKey(edge.source)) {
 					val = dict.get(edge.source);
@@ -108,6 +108,15 @@ public class EdgeDict {
 					val.add(edge);					
 				}
 				dict.put(edge.source, val);
+				// from target to source
+				if (dict.containsKey(edge.target)) {
+					val = dict.get(edge.target);
+					val.add(edge);
+				} else {
+					val = new HashSet<InputEdge>();
+					val.add(edge);					
+				}
+				dict.put(edge.target, val);
 			}
 		}
 	}

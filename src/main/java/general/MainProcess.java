@@ -16,8 +16,9 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
+import javax.swing.plaf.synth.SynthSplitPaneUI;
+
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import dict.EdgeDict;
@@ -66,6 +67,8 @@ public class MainProcess {
 	private static boolean colorByRepresType;
 	/** parameter: true iff only cluster representatives are printed to the geojson output */
 	private static boolean onlyRepresentative;
+	/** parameter: only vertices which contains a specific type, like 'Settlement'. */
+	private static String typeRestriction;
 	/** parameter: true iff partitions the data into different regions; each region is a file */
 	private static boolean partition;
 	
@@ -99,6 +102,7 @@ public class MainProcess {
 		noRepresentative = Boolean.parseBoolean(properties.getProperty("noRepresentative").trim());
 		colorByRepresType = Boolean.parseBoolean(properties.getProperty("colorByRepresType").trim());
 		onlyRepresentative = Boolean.parseBoolean(properties.getProperty("onlyRepresentative").trim());
+		typeRestriction = properties.getProperty("typeRestriction").trim();
 		partition = Boolean.parseBoolean(properties.getProperty("partition").trim());
 		
 		// 1. create dictionaries
@@ -136,6 +140,24 @@ public class MainProcess {
 				log.error("No ccID "+ccId+" exists!");
 			}
 		}
+		
+		// 2.3 get only vertices which contain a specific type
+		if (!typeRestriction.equalsIgnoreCase("all")) {
+			Set<Long> newVertexIds = new HashSet<Long>();
+			for (Long vertexId : vertexIds) {
+				Vertex vertex = dictVertex.getVertexById(vertexId);
+				System.out.println("vertex: "+vertex);
+				if (checkTypeRestriction(vertex, typeRestriction, dictEdge, dictVertex)) {
+					newVertexIds.add(vertexId);
+					System.out.println("\t !!");
+				}
+			}
+			log.info("Type restriction reduced the set of vertices from "+vertexIds.size()+" to "+newVertexIds.size());
+			vertexIds = newVertexIds;
+		} else
+			log.info("No type restriction!");
+		
+				
 		// partition containers
 		Map<Region, String> filesForOriginalLinks = new HashMap<Region, String>();
 		Map<Region, String> filesForNewClusters = new HashMap<Region, String>();
@@ -146,7 +168,8 @@ public class MainProcess {
 		// iterate through the vertex ID set
 		log.info("Iterate through vertex IDs. Partition: "+partition);
 		for (Long vertexId : vertexIds) {
-			ClusterRepresentative r = dictRepresentative.getRepresentativeByItsVertexId(vertexId);			
+			ClusterRepresentative r = dictRepresentative.getRepresentativeByItsVertexId(vertexId);
+			
 			// check for partition
 			if (partition) {
 				// get regions of the current representative
@@ -214,11 +237,11 @@ public class MainProcess {
 		}			
 		
 		for (Region region : partitionRepresentatives.keySet()) {
-			log.info("Current region: "+region.label+", #representatives: "+partitionRepresentatives.get(region).size());
+			log.info("Current region: "+region.label);
 			// 4. create and save original links
 			manageOriginalLinks(dictEdge, dictVertex, partitionVertexIds.get(region), filesForOriginalLinks.get(region));
 			// 5. create and save new clusters
-			manageNewClusters(dictVertex, partitionRepresentatives.get(region), filesForNewClusters.get(region));
+			manageNewClusters(dictVertex, partitionRepresentatives.get(region), filesForNewClusters.get(region), vertexIds);
 		}
 		
 		
@@ -260,23 +283,42 @@ public class MainProcess {
 		return subset;
 	}
 	
+	private static boolean checkTypeRestriction(Vertex v, String type, EdgeDict dictEdge, VertexDict dictVertex) {
+		boolean isFulfilled = false;
+		
+		if (v.ontology.equals("http://data.nytimes.com/")) {
+			Set<InputEdge> edges = dictEdge.getEdgeByStartId(v.id);
+			for (InputEdge edge : edges) {
+				Vertex s  = dictVertex.getVertexById(edge.source);
+				Vertex t = dictVertex.getVertexById(edge.target);
+								
+				if (s.ontology.equals("http://sws.geonames.org/")) {
+					isFulfilled = s.typeInternInput.contains(typeRestriction);
+					break;
+				}
+				
+				if (t.ontology.equals("http://sws.geonames.org/")) {
+					isFulfilled = t.typeInternInput.contains(typeRestriction);
+					break;
+				}
+			}
+		} else 
+			isFulfilled = v.typeInternInput.contains(typeRestriction);
+		return isFulfilled;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private static void manageOriginalLinks(EdgeDict dictEdge, VertexDict dictVertex, Set<Long> vertexIds, String loc) {
 		// 1 construct GeoJSON objects of the original links
-		log.info("Constructing original links ... ");
+		log.info("Constructing original links from "+vertexIds.size()+" vertices ... ");
 		GeoJsonBuilder geo = new GeoJsonBuilder(colorByVertexType, colorByRepresType, noRepresentative, onlyRepresentative);
 		List<JSONObject> features = new ArrayList<JSONObject>();
 		Set<InputEdge> edges = dictEdge.getEdgesByVertexIds(vertexIds);
-		try {
-			features.addAll(geo.buildOldStructureWithSimVal(dictVertex, edges));
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
-		
+		features.addAll(geo.buildOldStructureWithSimVal(dictVertex, edges));
+				
 		// 2 save GeoJSON objects of old structure
 		try (PrintWriter writerOriginalLinks = new PrintWriter(new BufferedWriter(new FileWriter(loc)));) {
-			log.info("|features original links| = "+features.size());	
-			log.info("Writing to "+loc+" ... ");
+			log.info("|features original links| = "+features.size()+"\tWriting to "+loc+" ... ");
 			writerOriginalLinks.println("{\n\"type\": \"FeatureCollection\",\n\"features\": [");
 			for (int i = 0; i < features.size(); i++) {
 				features.get(i).writeJSONString(writerOriginalLinks);
@@ -291,7 +333,7 @@ public class MainProcess {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void manageNewClusters(VertexDict dictVertex, Set<ClusterRepresentative> representatives, String loc) {
+	private static void manageNewClusters(VertexDict dictVertex, Set<ClusterRepresentative> representatives, String loc, Set<Long> vertexIds) {
 		// 1 construct GeoJSON objects for each representative
 		log.info("Iterating through cluster representatives (#: "+representatives.size()+") ... ");	
 		GeoJsonBuilder geo = new GeoJsonBuilder(colorByVertexType, colorByRepresType, noRepresentative, onlyRepresentative);
@@ -303,8 +345,15 @@ public class MainProcess {
 			// build GeoJSON objects of new clusters
 			Set<Vertex> otherNodes = new HashSet<Vertex>();
 			for (Long id : clusterRepr.clusteredVertexIds) {
-				Vertex v = dictVertex.getVertexById(id);
-				otherNodes.add(v);
+				if (!typeRestriction.equals("all")) {
+					// make sure that no nodes are added which does not fulfill the type restriction
+					Vertex v = dictVertex.getVertexById(id);
+					if (vertexIds.contains(v.id))
+						otherNodes.add(v);
+				} else {
+					Vertex v = dictVertex.getVertexById(id);
+					otherNodes.add(v);
+				}
 			}
 			
 			String json = MergedClusterParser.printClusterRepresentative(clusterRepr);
@@ -335,14 +384,12 @@ public class MainProcess {
 			for (String line : evalData)
 				w.println(line.substring(line.indexOf("_#####_")+"_#####_".length()));
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
 		// 2 save GeoJSON objects of new clusters
 		try (PrintWriter writerCluster = new PrintWriter(new BufferedWriter(new FileWriter(loc)));) {
-			log.info("|features new clusters| = "+features.size());		
-			log.info("Writing to "+loc+" ... ");
+			log.info("|features new clusters| = "+features.size()+"\tWriting to "+loc+" ... ");
 			writerCluster.println("{\n\"type\": \"FeatureCollection\",\n\"features\": [");
 			for (int i = 0; i < features.size(); i++) {
 				features.get(i).writeJSONString(writerCluster);
