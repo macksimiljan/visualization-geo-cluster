@@ -353,14 +353,20 @@ public class MainProcess {
 				}
 			}
 			
-			String nodes = "[", ontologies = "[";
+			String nodes = "[", ontologies = "[", typeInternString = "[";
+			Set<String> typeIntern = new HashSet<String>();
 			for (Vertex v : otherNodes) {
 				nodes += v.id+",";
 				ontologies += "\""+v.ontology+"\",";
+				typeIntern.addAll(v.typeInternInput);
 			}
+			for (String type : typeIntern)
+				if (!type.equals("no_type"))
+					typeInternString += "\""+type+"\",";
 			nodes = nodes.substring(0, nodes.length()-1)+"]";
+			typeInternString = (typeInternString.length() > 1) ? typeInternString.substring(0, typeInternString.length()-1)+"]" : typeInternString+"]";
 			ontologies = ontologies.substring(0, ontologies.length()-1)+"]";
-			evalData.add(clusterRepr.label+"_#####_"+"{\"data\":{\"label\":\""+clusterRepr.label+"\",\"clusteredVertices\":"+nodes+",\"ontologies\":"+ontologies+",\"simpleType\":\"Settlement\"}}");
+			evalData.add(clusterRepr.label+"_#####_"+"{\"id\":"+clusterRepr.id+",\"data\":{\"label\":\""+clusterRepr.label+"\",\"clusteredVertices\":"+nodes+",\"ontologies\":"+ontologies+",\"typeIntern\":"+typeInternString+",\"simpleType\":\"Settlement\"}}");
 			
 			try {
 				if (onlyInterestingClusters && interestingSize < 0) {

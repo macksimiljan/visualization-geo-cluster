@@ -94,7 +94,7 @@ public class PerfectStandardGuide {
 						System.out.println("types: "+cluster.typeIntern);
 						repeat = IOTools.readChar(" >> Add another type? [y/n] ");
 						while (repeat == 'y') {
-							String addType = IOTools.readString(" >> additional type: ").trim();
+							String addType = IOTools.readLine(" >> additional type: ").trim();
 							cluster.typeIntern.add(addType);
 							do {
 								repeat = IOTools.readChar(" >> another type? [y/n] ");
