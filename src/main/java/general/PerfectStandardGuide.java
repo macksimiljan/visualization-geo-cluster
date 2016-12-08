@@ -44,6 +44,10 @@ public class PerfectStandardGuide {
 			MergedClusterParser parser = new MergedClusterParser();
 			String line;
 			while ((line = r.readLine()) != null) {
+				commentWriter.flush();
+				out.flush();
+				
+				
 				ClusterRepresentative cluster = parser.parseLine(line);
 				System.out.println();
 				System.out.println("###########################################");
@@ -51,7 +55,7 @@ public class PerfectStandardGuide {
 				System.out.println("-------------------------------");
 				
 				boolean printCluster = true;
-				char evalCluster = 'y';
+				char evalCluster = (cluster.clusteredVertexIds.size() == 4) ? 'n' : 'y';
 				while (evalCluster == 'y') {
 					// actions
 					Character[] actions = {'n', 't', 'a', 'c', 'e', 'd', 'l'};
