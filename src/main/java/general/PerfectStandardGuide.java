@@ -41,14 +41,27 @@ public class PerfectStandardGuide {
 		try (BufferedReader r = new BufferedReader(new FileReader(path+file));
 				PrintWriter commentWriter =  new PrintWriter(new BufferedWriter(new FileWriter(path+commentFile, true)));
 				PrintWriter out =  new PrintWriter(new BufferedWriter(new FileWriter(path+"mod_"+file, true)));) {
+			
+			char go = IOTools.readChar("Go to ... ? [y/n]");
+			long goId = 0;
+			if (go == 'y')
+				goId = IOTools.readLong("ID: >> ");
+				
 			MergedClusterParser parser = new MergedClusterParser();
 			String line;
 			while ((line = r.readLine()) != null) {
+				
 				commentWriter.flush();
 				out.flush();
 				
 				
 				ClusterRepresentative cluster = parser.parseLine(line);
+				
+				if (go == 'y' && goId != cluster.id)
+					continue;
+				else if (go == 'y' && goId == cluster.id)
+					go = 'n';
+				
 				System.out.println();
 				System.out.println("###########################################");
 				System.out.println("label:\t\t"+cluster.label+"\nsimple type:\t"+cluster.simpleType+"\nnodes:\t\t"+cluster.clusteredVertexIds);
