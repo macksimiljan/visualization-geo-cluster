@@ -95,7 +95,7 @@ public class TypeAnalyser {
 				Set<String> type = r.typeIntern;
 				ta.addType(type);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

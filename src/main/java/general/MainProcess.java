@@ -1,8 +1,11 @@
 package general;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,8 +18,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
-
-import javax.swing.plaf.synth.SynthSplitPaneUI;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -153,6 +154,55 @@ public class MainProcess {
 			vertexIds = newVertexIds;
 		} else
 			log.info("No type restriction!");
+		
+		
+		//TODO:
+		Set<Long> evaluatedNodes = new HashSet<>();
+		try (BufferedReader r = new BufferedReader(new FileReader("/home/max/Dropbox/eval/combinedSettlements.json"))) {
+			MergedClusterParser parser = new MergedClusterParser();
+			String line;
+			while ((line = r.readLine()) != null) {
+				line = line.substring(0, line.length()-1);
+				ClusterRepresentative cluster = parser.parseLine(line);
+				Set<Long> clusteredVertexIds = cluster.clusteredVertexIds;
+				evaluatedNodes.addAll(clusteredVertexIds);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		Set<Long> newVertexIds = new HashSet<Long>();
+		for (Long vertexId : vertexIds) {
+			Set<Long> ids = (dictRepresentative.getRepresentativeByItsVertexId(vertexId)).clusteredVertexIds;
+			// check whether one of these nodes is already evaluated as being correct
+			boolean isCorrect = false;
+			for (Long id : ids) {
+				if (evaluatedNodes.contains(id))
+					isCorrect = true;
+			}
+			
+			if (!isCorrect)
+				continue;
+			
+			boolean lessThanClustered = false;
+			for (Long id : ids) {
+				if (!vertexIds.contains(id)) {
+					// a node which is part of the cluster but does not fulfill the type restriction
+					// add such a node only if it is an AdmRegion or a Country or has no type
+					Set<String> typeIntern = dictVertex.getVertexById(id).typeInternInput;
+					if (typeIntern.contains("AdministrativeRegion") || typeIntern.contains("no_type") || typeIntern.contains("Country")) {
+						newVertexIds.add(id);
+						lessThanClustered = true;
+					}
+				} else
+					newVertexIds.add(id);
+			}
+			if (!lessThanClustered)
+				newVertexIds.removeAll(ids);
+		}
+		vertexIds = newVertexIds;
+		
+		
 		
 				
 		// partition containers
@@ -301,6 +351,7 @@ public class MainProcess {
 			}
 		} else 
 			isFulfilled = v.typeInternInput.contains(typeRestriction);
+		
 		return isFulfilled;
 	}
 	

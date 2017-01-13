@@ -37,7 +37,7 @@ public class RepresentativeDict {
 	 * @param mergedClusterFileLoc The merged cluster file.
 	 * @throws IOException If loading the dictionary fails.
 	 */
-	public RepresentativeDict(String mergedClusterFileLoc) throws IOException {
+	public RepresentativeDict(String mergedClusterFileLoc) throws Exception {
 		this.file = new File(mergedClusterFileLoc);
 		if (!this.file.exists())
 			throw new FileNotFoundException("Could not find file "+mergedClusterFileLoc);
@@ -79,7 +79,7 @@ public class RepresentativeDict {
 	 * @throws FileNotFoundException If merged cluster file not found.
 	 * @throws IOException If reading the file fails.
 	 */
-	private void loadDict() throws FileNotFoundException, IOException {
+	private void loadDict() throws Exception {
 		try(BufferedReader reader = new BufferedReader(new FileReader(file));) {
 			MergedClusterParser parser = new MergedClusterParser();
 			String line = null;
